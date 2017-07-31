@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<language xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/maelstrom/language.xsd" languagecode="de">
+	<category name="wcf.acp.option">
+		<item name="wcf.acp.option.category.wsc_connect"><![CDATA[WSC-Connect]]></item>
+		<item name="wcf.acp.option.category.wsc_connect.general"><![CDATA[Allgemein]]></item>
+		<item name="wcf.acp.option.wsc_connect_app_id"><![CDATA[App-ID]]></item>
+		<item name="wcf.acp.option.wsc_connect_app_id.description"><![CDATA[Ihre App-ID finden Sie im Dashboard auf <a href="{@$__wcf->getPath()}acp/dereferrer.php?url={'https://www.wsc-connect.com'|rawurlencode}" class="externalURL">https://www.wsc-connect.com</a>. Bitte geben Sie dort als API-URL <a href="{link controller='WSCConnectAPI' isACP=false}{/link}">{link controller='WSCConnectAPI' isACP=false}{/link}</a> an]]></item>
+		<item name="wcf.acp.option.wsc_connect_app_secret"><![CDATA[App-Secret]]></item>
+		<item name="wcf.acp.option.wsc_connect_app_secret.description"><![CDATA[Ihr App-Secret finden Sie im Dashboard auf <a href="{@$__wcf->getPath()}acp/dereferrer.php?url={'https://www.wsc-connect.com'|rawurlencode}" class="externalURL">https://www.wsc-connect.com</a>.]]></item>
+		<item name="wcf.acp.option.wsc_connect_enable_push"><![CDATA[Push-Nachrichten aktivieren]]></item>
+		<item name="wcf.acp.option.wsc_connect_enable_push.description"><![CDATA[Wenn diese Option aktiviert ist, erhalten Nutzer Push-Benachrichtigungen auf ihr Smartphone. Push-Benachrichtigungen werden sofort verschickt und können einige Aktionen auf Ihrer Website verlangsamen.]]></item>
+		<item name="wcf.acp.option.module_wsc_connect"><![CDATA[WSC-Connect]]></item>
+		<item name="wcf.acp.option.wsc_connect_info_time"><![CDATA[Cookie-Dauer für Info-Popup]]></item>
+		<item name="wcf.acp.option.wsc_connect_info_time.description"><![CDATA[Die Dauer in Tagen, für wie lange das Popup, welches über die Vorteile der App-Nutzung auf mobilen Android-Geräten informiert, nicht angezeigt wird, nachdem der Nutzer dieses geschlossen hat.]]></item>
+	</category>
+
+	<category name="wcf.wsc_connect">
+		<item name="wcf.wsc_connect.info"><![CDATA[Lade dir die kostenlose Android-App <strong>WSC-Connect</strong> herunter und erhalte Push-Nachrichten von <strong>{@$name}</strong> direkt auf dein Smartphone. Jetzt im Play-Store herunterladen!]]></item>
+		<item name="wcf.wsc_connect.wsc_connect"><![CDATA[WSC-Connect]]></item>
+		<item name="wcf.user.wsc_connect.thirdParty.title"><![CDATA[Drittanbieter-Login]]></item>
+		<item name="wcf.user.wsc_connect.thirdParty.label"><![CDATA[Drittanbieter-Auth-Token]]></item>
+		<item name="wcf.user.wsc_connect.thirdParty.description"><![CDATA[Bitte geben Sie dieses Token beim Login über die App anstelle eines Passworts an.]]></item>
+		<item name="wcf.user.wsc_connect.thirdParty.notConnected"><![CDATA[Sie sind nicht per Drittanbieter angemeldet. Nutzer Sie ihr Benutzername und Passwort, um sich in der App anzumelden.]]></item>
+	</category>
+
+	<category name="wcf.user.menu">
+		<item name="wcf.user.menu.settings.wscConnect"><![CDATA[WSC-Connect]]></item>
+	</category>
+</language>

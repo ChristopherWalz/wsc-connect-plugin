@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/maelstrom/option.xsd">
+	<import>
+		<categories>
+			<category name="wsc_connect">
+				<options>module_wsc_connect</options>
+			</category>
+
+			<category name="wsc_connect.general">
+				<parent>wsc_connect</parent>
+			</category>
+		</categories>
+
+		<options>
+			<option name="module_wsc_connect">
+				<categoryname>module.community</categoryname>
+				<optiontype>boolean</optiontype>
+				<defaultvalue>1</defaultvalue>
+			</option>
+
+			<option name="wsc_connect_enable_push">
+				<categoryname>wsc_connect.general</categoryname>
+				<optiontype>boolean</optiontype>
+				<defaultvalue>1</defaultvalue>
+			</option>
+
+			<option name="wsc_connect_app_id">
+				<categoryname>wsc_connect.general</categoryname>
+				<optiontype>text</optiontype>
+			</option>
+			
+			<option name="wsc_connect_app_secret">
+				<categoryname>wsc_connect.general</categoryname>
+				<optiontype>password</optiontype>
+			</option>
+
+			<option name="wsc_connect_info_time">
+				<categoryname>wsc_connect.general</categoryname>
+				<optiontype>integer</optiontype>
+				<defaultvalue>30</defaultvalue>
+				<minvalue>1</minvalue>
+				<suffix>days</suffix>
+			</option>
+		</options>
+	</import>
+</data>

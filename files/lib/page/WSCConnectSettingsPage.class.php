@@ -48,7 +48,7 @@ class WSCConnectSettingsPage extends AbstractPage {
 		}
 	}
 
-/**
+	/**
 	 * @inheritDoc
 	 */
 	public function show() {

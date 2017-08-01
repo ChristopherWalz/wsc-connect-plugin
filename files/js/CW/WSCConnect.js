@@ -58,7 +58,6 @@ define(['WoltLabSuite/Core/Environment'], function(Environment) {
 			date.setTime(date.getTime() + (this.cookieTime*24*60*60*1000));
 			var expires = date.toUTCString();
 
-			var url = window.location.hostname.replace('www.', '');
 			document.cookie = this.cookieName + '=1; max-age=' + maxAge + '; expires=' + expires + '; path=/';		
 		}
 	};

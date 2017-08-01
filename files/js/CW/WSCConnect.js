@@ -39,7 +39,7 @@ define(['WoltLabSuite/Core/Environment'], function(Environment) {
 			}
 		},
 
-		setCookie() {
+		setCookie: function () {
 			var maxAge = 60*60*24*this.cookieTime;
 
 			var date = new Date();

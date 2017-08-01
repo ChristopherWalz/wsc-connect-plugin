@@ -18,10 +18,13 @@
 				<defaultvalue>1</defaultvalue>
 			</option>
 
-			<option name="wsc_connect_enable_push">
+			<option name="wsc_connect_push_mode">
 				<categoryname>wsc_connect.general</categoryname>
-				<optiontype>boolean</optiontype>
-				<defaultvalue>1</defaultvalue>
+				<optiontype>select</optiontype>
+				<defaultvalue><![CDATA[immediately]]></defaultvalue>
+				<selectoptions><![CDATA[immediately:wcf.acp.option.wsc_connect_push_mode.immediately
+batch:wcf.acp.option.wsc_connect_push_mode.batch
+disable:wcf.acp.option.wsc_connect_push_mode.disable]]></selectoptions>
 			</option>
 
 			<option name="wsc_connect_app_id">
@@ -43,4 +46,8 @@
 			</option>
 		</options>
 	</import>
+
+	<delete>
+		<option name="wsc_connect_enable_push" />
+	</delete>
 </data>

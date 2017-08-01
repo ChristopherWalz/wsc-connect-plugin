@@ -7,8 +7,11 @@
 		<item name="wcf.acp.option.wsc_connect_app_id.description"><![CDATA[Ihre App-ID finden Sie im Dashboard auf <a href="{@$__wcf->getPath()}acp/dereferrer.php?url={'https://www.wsc-connect.com'|rawurlencode}" class="externalURL">https://www.wsc-connect.com</a>. Bitte geben Sie dort als API-URL <a href="{link controller='WSCConnectAPI' isACP=false}{/link}">{link controller='WSCConnectAPI' isACP=false}{/link}</a> an]]></item>
 		<item name="wcf.acp.option.wsc_connect_app_secret"><![CDATA[App-Secret]]></item>
 		<item name="wcf.acp.option.wsc_connect_app_secret.description"><![CDATA[Ihr App-Secret finden Sie im Dashboard auf <a href="{@$__wcf->getPath()}acp/dereferrer.php?url={'https://www.wsc-connect.com'|rawurlencode}" class="externalURL">https://www.wsc-connect.com</a>.]]></item>
-		<item name="wcf.acp.option.wsc_connect_enable_push"><![CDATA[Push-Nachrichten aktivieren]]></item>
-		<item name="wcf.acp.option.wsc_connect_enable_push.description"><![CDATA[Wenn diese Option aktiviert ist, erhalten Nutzer Push-Benachrichtigungen auf ihr Smartphone. Push-Benachrichtigungen werden sofort verschickt und können einige Aktionen auf Ihrer Website verlangsamen.]]></item>
+		<item name="wcf.acp.option.wsc_connect_push_mode"><![CDATA[Versandmethode für Push-Nachrichten]]></item>
+		<item name="wcf.acp.option.wsc_connect_push_mode.description"><![CDATA[Die Option "Sofort" versendet Benachrichtigunen für Nutzer direkt und diese erhalten eine Push-Benachrichtigung auf ihr Smartphone. Diese Methode kann einige Aktionen auf Ihrer Website verlangsamen. "Batch" sammelt alle Benachrichtigungen und sendet diese per Cronjob in regelmäßigen Abständen. Die Push-Benachrichtigungen kommen mit wenigen Minuten Verzögerungen an, dafür werden die Aktionen auf Ihrer Website nicht verlangsamt.]]></item>
+		<item name="wcf.acp.option.wsc_connect_push_mode.immediately"><![CDATA[Sofort]]></item>
+		<item name="wcf.acp.option.wsc_connect_push_mode.batch"><![CDATA[Batch]]></item>
+		<item name="wcf.acp.option.wsc_connect_push_mode.disable"><![CDATA[Deaktiviert]]></item>
 		<item name="wcf.acp.option.module_wsc_connect"><![CDATA[WSC-Connect]]></item>
 		<item name="wcf.acp.option.wsc_connect_info_time"><![CDATA[Cookie-Dauer für Info-Popup]]></item>
 		<item name="wcf.acp.option.wsc_connect_info_time.description"><![CDATA[Die Dauer in Tagen, für wie lange das Popup, welches über die Vorteile der App-Nutzung auf mobilen Android-Geräten informiert, nicht angezeigt wird, nachdem der Nutzer dieses geschlossen hat.]]></item>

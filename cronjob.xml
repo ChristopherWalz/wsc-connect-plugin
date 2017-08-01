@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/vortex/cronjob.xsd">
+	<import>
+		<cronjob name="de.cwalz.wscConnect.sendNotification">
+			<classname>wcf\system\cronjob\WSCConnectNotificationsCronjob</classname>
+			<description>Sends batched notifications to the smartphone</description>
+			<description language="de">Sendet die gespeicherten Benachrichtigungen an das Smartphone</description>
+			<startminute>*/5</startminute>
+			<starthour>*</starthour>
+			<startdom>*</startdom>
+			<startmonth>*</startmonth>
+			<startdow>*</startdow>
+			<canbeedited>1</canbeedited>
+			<canbedisabled>1</canbedisabled>
+		</cronjob>
+	</import>
+</data>

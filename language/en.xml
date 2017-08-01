@@ -7,8 +7,11 @@
 		<item name="wcf.acp.option.wsc_connect_app_id.description"><![CDATA[You can find your App-ID on the Dashboard on <a href="{@$__wcf->getPath()}acp/dereferrer.php?url={'https://www.wsc-connect.com'|rawurlencode}" class="externalURL">https://www.wsc-connect.com</a>. Please use <a href="{link controller='WSCConnectAPI' isACP=false}{/link}">{link controller='WSCConnectAPI' isACP=false}{/link}</a> as your API-URL.]]></item>
 		<item name="wcf.acp.option.wsc_connect_app_secret"><![CDATA[App-Secret]]></item>
 		<item name="wcf.acp.option.wsc_connect_app_secret.description"><![CDATA[You can find your App-Secret on the Dashboard on <a href="{@$__wcf->getPath()}acp/dereferrer.php?url={'https://www.wsc-connect.com'|rawurlencode}" class="externalURL">https://www.wsc-connect.com</a>.]]></item>
-		<item name="wcf.acp.option.wsc_connect_enable_push"><![CDATA[Enable push messages]]></item>
-		<item name="wcf.acp.option.wsc_connect_enable_push.description"><![CDATA[By enabling this option, users receive push messages on their smartphone. Push messages are sent immediately and can slow down some actions on your website.]]></item>
+		<item name="wcf.acp.option.wsc_connect_push_mode"><![CDATA[Delivery method for push messages]]></item>
+		<item name="wcf.acp.option.wsc_connect_push_mode.description"><![CDATA[The option "Immediately" sends push messages to the users smartphone immediately. This method can slow down some actions on your website. "Batch" collects all notifications and sends them via cronjob in regular intervals. Push messages arrive delayed, but your website will not be slowed down.]]></item>
+		<item name="wcf.acp.option.wsc_connect_push_mode.immediately"><![CDATA[Immediately]]></item>
+		<item name="wcf.acp.option.wsc_connect_push_mode.batch"><![CDATA[Batch]]></item>
+		<item name="wcf.acp.option.wsc_connect_push_mode.disable"><![CDATA[Disabled]]></item>
 		<item name="wcf.acp.option.module_wsc_connect"><![CDATA[WSC-Connect]]></item>
 		<item name="wcf.acp.option.wsc_connect_info_time"><![CDATA[Cookie time for the info popup]]></item>
 		<item name="wcf.acp.option.wsc_connect_info_time.description"><![CDATA[Time in days, for how long the popup, which informs android users about the app, is not shown, after it has been closed by the user.]]></item>

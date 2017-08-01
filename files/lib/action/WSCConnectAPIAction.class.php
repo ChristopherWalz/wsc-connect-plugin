@@ -49,6 +49,10 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	public function readParameters() {
 		parent::readParameters();
 
+		if (!MODULE_WSC_CONNECT) {
+			throw new AJAXException('API disabled');
+		}
+
 		// check user agent
 		if ($_SERVER['HTTP_USER_AGENT'] != self::USER_AGENT) {
 			throw new AJAXException('Access not allowed', AJAXException::INSUFFICIENT_PERMISSIONS);

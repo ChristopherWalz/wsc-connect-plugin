@@ -17,6 +17,18 @@ define(['WoltLabSuite/Core/Environment'], function(Environment) {
 				// check for existing cookie
 				if (document.cookie.match(new RegExp('(^| )' + this.cookieName + '=([^;]+)')) === null) {
 					var wscConnectInfo = elById('wscConnectInfo');
+					var cookieNotice = elBySel('.cookiePolicyNotice');
+					
+					// move info up, if the cookie notice is displayed
+					if (cookieNotice) {
+						wscConnectInfo.style.bottom = cookieNotice.offsetHeight + 'px';
+
+						// reset when closing the cookie notice
+						elBySel('.cookiePolicyNoticeDismiss').addEventListener(WCF_CLICK_EVENT, function(event) {
+							wscConnectInfo.style.bottom = 0;
+						});
+					}
+
 					elShow(wscConnectInfo);
 
 					wscConnectInfo.addEventListener(WCF_CLICK_EVENT, function(e) {
@@ -46,6 +58,7 @@ define(['WoltLabSuite/Core/Environment'], function(Environment) {
 			date.setTime(date.getTime() + (this.cookieTime*24*60*60*1000));
 			var expires = date.toUTCString();
 
+			var url = window.location.hostname.replace('www.', '');
 			document.cookie = this.cookieName + '=1; max-age=' + maxAge + '; expires=' + expires + '; path=/';		
 		}
 	};

@@ -15,7 +15,7 @@ class WSCConnectListener implements IParameterizedEventListener {
 	 * The API-URL to push the notifications to.
 	 * @var	string
 	 */
-	const API_URL = 'http://localhost:1337/notifications';
+	const API_URL = 'https://api.wsc-connect.com/notifications';
 
 	/**
 	 * Immediately push mode option

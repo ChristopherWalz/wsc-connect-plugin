@@ -13,5 +13,18 @@
 			<canbeedited>1</canbeedited>
 			<canbedisabled>1</canbedisabled>
 		</cronjob>
+
+		<cronjob name="de.cwalz.wscConnect.purgeLoginAttempts">
+			<classname>wcf\system\cronjob\WSCConnectPurgeLoginsCronjob</classname>
+			<description>Removes expired failed login attempts</description>
+			<description language="de">Entfernt abgelaufene fehlerhafte Loginversuche</description>
+			<startminute>*/1</startminute>
+			<starthour>*</starthour>
+			<startdom>*</startdom>
+			<startmonth>*</startmonth>
+			<startdow>*</startdow>
+			<canbeedited>0</canbeedited>
+			<canbedisabled>0</canbedisabled>
+		</cronjob>
 	</import>
 </data>

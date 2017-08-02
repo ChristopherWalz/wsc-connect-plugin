@@ -26,6 +26,12 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	const USER_AGENT = 'WSC-Connect API';
 
 	/**
+	 * The maximum failed login attempts
+	 * @var	int
+	 */
+	const MAX_LOGIN_ATTEMPTS = 5;
+
+	/**
 	 * A valid request type
 	 * @var	string
 	 */
@@ -119,7 +125,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	 * Trys to login with the given username and password
 	 */
 	private function login() {
-		$username = (isset($_REQUEST['username'])) ? StringUtil::trim($_REQUEST['username']) : null;
+		$username = (isset($_REQUEST['username'])) ? mb_strtolower(StringUtil::trim($_REQUEST['username'])) : null;
 		$password = (isset($_REQUEST['password'])) ? StringUtil::trim($_REQUEST['password']) : null;
 		$thirdPartyLogin = (isset($_REQUEST['thirdPartyLogin'])) ? filter_var($_REQUEST['thirdPartyLogin'], FILTER_VALIDATE_BOOLEAN) : false;
 
@@ -127,7 +133,21 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			throw new AJAXException('Missing parameters', AJAXException::MISSING_PARAMETERS);
 		}
 
-		// TODO count login requests and limit on 5/minute for the same account
+		// prevent brute forcing
+		$conditions = new PreparedStatementConditionBuilder();
+		$conditions->add("user = ?", array($username));
+		$conditions->add("attempts >= ?", array(self::MAX_LOGIN_ATTEMPTS));
+
+		$sql = "SELECT user
+				FROM wcf".WCF_N."_wsc_connect_login_attempts
+				".$conditions;
+		$statement = WCF::getDB()->prepareStatement($sql, 1);
+		$statement->execute($conditions->getParameters());
+
+		// max attempts reached
+		if ($statement->fetchColumn()) {
+			throw new AJAXException('Max login attempts reached. Try again later.', AJAXException::MISSING_PARAMETERS);
+		}
 
 		$loginSuccess = true;
 		$user = null;
@@ -177,6 +197,20 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 				'wscConnectToken' => $wscConnectToken
 			]]);
 			$userAction->executeAction();
+		} else {
+			// log failed login attempt
+			$sql = "INSERT INTO			wcf".WCF_N."_wsc_connect_login_attempts
+								(user, attempts, time)
+				VALUES				(?, ?, ?)
+				ON DUPLICATE KEY UPDATE		attempts=attempts+1,
+											time = ?";
+			$statement = WCF::getDB()->prepareStatement($sql);
+			$statement->execute([
+				$username,
+				1,
+				TIME_NOW,
+				TIME_NOW
+			]);
 		}
 
 		$this->sendJsonResponse([

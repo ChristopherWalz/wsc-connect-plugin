@@ -11,7 +11,7 @@ Take part
 ---------
 You can [register your own WSC-Instance](https://www.wsc-connect.com/register) right after you installed the plugin into your WSC.
 
-You want to get more information? Check the [FAQ](https://www.wsc-connect.com/faq) or send us an email.
+You want to get more information? Check the [FAQ](https://www.wsc-connect.com/faq) or send us an email to hello@wsc-connect.com.
 
 Who takes part?
 ---------------

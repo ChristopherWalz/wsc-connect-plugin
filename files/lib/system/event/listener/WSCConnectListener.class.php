@@ -54,15 +54,14 @@ class WSCConnectListener implements IParameterizedEventListener {
 			}
 		}
 
-
 		if (!empty($userIDs)) {
 			$notification = [
 				'userIDs' => $userIDs,
 				'message' => $parameters['event']->getMessage(),
-				'avatar' => $parameters['event']->getAuthor()->getAvatar()->getUrl(32),
-				'time' => TIME_NOW,
-				'confirmed' => $parameters['event']->isConfirmed(),
-				'link' => $parameters['event']->getLink()
+				'authorID' => $parameters['event']->getAuthor()->userID,
+				'time' => $parameters['notificationObject']->getTime(),
+				'link' => $parameters['event']->getLink(),
+				'eventHash' => $parameters['event']->getEventHash()
 			];
 
 			switch (WSC_CONNECT_PUSH_MODE) {

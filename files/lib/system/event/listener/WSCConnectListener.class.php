@@ -59,7 +59,7 @@ class WSCConnectListener implements IParameterizedEventListener {
 				'userIDs' => $userIDs,
 				'message' => $parameters['event']->getMessage(),
 				'authorID' => $parameters['event']->getAuthor()->userID,
-				'time' => $parameters['notificationObject']->getTime(),
+				'time' => TIME_NOW,
 				'link' => $parameters['event']->getLink(),
 				'eventHash' => $parameters['event']->getEventHash()
 			];

@@ -13,41 +13,42 @@ define(['WoltLabSuite/Core/Environment'], function(Environment) {
 			this.cookieName = cookiePrefix + 'wscconnect';
 			this.cookieTime = parseInt(cookieTime);
 
-			if (Environment.platform() === 'android') {
-				// check for existing cookie
-				if (document.cookie.match(new RegExp('(^| )' + this.cookieName + '=([^;]+)')) === null) {
-					var wscConnectInfo = elById('wscConnectInfo');
-					var cookieNotice = elBySel('.cookiePolicyNotice');
-					
-					// move info up, if the cookie notice is displayed
-					if (cookieNotice) {
-						wscConnectInfo.style.bottom = cookieNotice.offsetHeight + 'px';
+			var userAgent = window.navigator.userAgent.toLowerCase();
+			if (Environment.platform() === 'android' && 
+				userAgent.indexOf('WSC-Connect Mobile Browser') === -1 &&
+				document.cookie.match(new RegExp('(^| )' + this.cookieName + '=([^;]+)')) === null) {
 
-						// reset when closing the cookie notice
-						elBySel('.cookiePolicyNoticeDismiss').addEventListener(WCF_CLICK_EVENT, function(event) {
-							wscConnectInfo.style.bottom = 0;
-						});
-					}
+				var wscConnectInfo = elById('wscConnectInfo');
+				var cookieNotice = elBySel('.cookiePolicyNotice');
+				
+				// move info up, if the cookie notice is displayed
+				if (cookieNotice) {
+					wscConnectInfo.style.bottom = cookieNotice.offsetHeight + 'px';
 
-					elShow(wscConnectInfo);
-
-					wscConnectInfo.addEventListener(WCF_CLICK_EVENT, function(e) {
-						e.preventDefault();
-						
-						this.setCookie();
-
-						var href = elData(wscConnectInfo, 'href');
-						window.location = href;
-					}.bind(this));
-
-
-					elById('wscConnectInfoClose').addEventListener(WCF_CLICK_EVENT, function(e) {
-						e.stopPropagation();
-
-						elRemove(wscConnectInfo);
-						this.setCookie();
-					}.bind(this));
+					// reset when closing the cookie notice
+					elBySel('.cookiePolicyNoticeDismiss').addEventListener(WCF_CLICK_EVENT, function(event) {
+						wscConnectInfo.style.bottom = 0;
+					});
 				}
+
+				elShow(wscConnectInfo);
+
+				wscConnectInfo.addEventListener(WCF_CLICK_EVENT, function(e) {
+					e.preventDefault();
+					
+					this.setCookie();
+
+					var href = elData(wscConnectInfo, 'href');
+					window.location = href;
+				}.bind(this));
+
+
+				elById('wscConnectInfoClose').addEventListener(WCF_CLICK_EVENT, function(e) {
+					e.stopPropagation();
+
+					elRemove(wscConnectInfo);
+					this.setCookie();
+				}.bind(this));
 			}
 		},
 

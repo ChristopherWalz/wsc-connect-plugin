@@ -15,7 +15,7 @@ define(['WoltLabSuite/Core/Environment'], function(Environment) {
 
 			var userAgent = window.navigator.userAgent.toLowerCase();
 			if (Environment.platform() === 'android' && 
-				userAgent.indexOf('WSC-Connect Mobile Browser') === -1 &&
+				userAgent.indexOf('wsc-connect mobile browser') === -1 &&
 				document.cookie.match(new RegExp('(^| )' + this.cookieName + '=([^;]+)')) === null) {
 
 				var wscConnectInfo = elById('wscConnectInfo');

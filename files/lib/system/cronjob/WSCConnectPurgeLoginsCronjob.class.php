@@ -28,7 +28,7 @@ class WSCConnectPurgeLoginsCronjob extends AbstractCronjob {
 		
 		// delete expired login attempts from database
 		$condition = new PreparedStatementConditionBuilder();
-		$condition->add('time < ?', [TIME_NOW - self::LOGIN_TIME_DURATION]);
+		$condition->add('time < ?', array(TIME_NOW - self::LOGIN_TIME_DURATION));
 		$sql = "DELETE FROM	wcf".WCF_N."_wsc_connect_login_attempts ".$condition;
 		$statement = WCF::getDB()->prepareStatement($sql);
 		$statement->execute($condition->getParameters());

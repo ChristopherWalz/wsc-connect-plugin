@@ -43,7 +43,7 @@ class WSCConnectListener implements IParameterizedEventListener {
 			return;
 		}
 
-		$userIDs = [];
+		$userIDs = array();
 
 		// Check if the users are logged in via the app. This could save as the HTTPRequest.
 		foreach ($parameters['recipientIDs'] as $userID) {
@@ -55,14 +55,14 @@ class WSCConnectListener implements IParameterizedEventListener {
 		}
 
 		if (!empty($userIDs)) {
-			$notification = [
+			$notification = array(
 				'userIDs' => $userIDs,
 				'message' => $parameters['event']->getMessage(),
 				'authorID' => $parameters['event']->getAuthor()->userID,
 				'time' => TIME_NOW,
 				'link' => $parameters['event']->getLink(),
 				'eventHash' => $parameters['event']->getEventHash()
-			];
+			);
 
 			switch (WSC_CONNECT_PUSH_MODE) {
 				case self::PUSH_MODE_IMMEDIATELY:
@@ -82,14 +82,14 @@ class WSCConnectListener implements IParameterizedEventListener {
 	 * @param 	boolean	$batch
 	 */
 	public static function sendNotification($notification, $batch = false) {
-		$data = [
+		$data = array(
 			'appSecret' => WSC_CONNECT_APP_SECRET,
 			'appID' => WSC_CONNECT_APP_ID,
 			'notification' => $notification,
 			'batch' => $batch
-		];
+		);
 
-		$request = new HTTPRequest(self::API_URL, ['method' => 'POST', 'timeout' => 5], $data);
+		$request = new HTTPRequest(self::API_URL, array('method' => 'POST', 'timeout' => 5), $data);
 
 		try {
 			$request->execute();
@@ -110,6 +110,6 @@ class WSCConnectListener implements IParameterizedEventListener {
 						(data)
 			VALUES			(?)";
 		$statement = WCF::getDB()->prepareStatement($sql);
-		$statement->execute([$encodedData]);
+		$statement->execute(array($encodedData));
 	}
 }

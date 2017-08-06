@@ -47,7 +47,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	 * Method types in this array do not need to deliver a valid appID/appSecret. Used for validation of this installation.
 	 * @var	array
 	 */
-	private $guestTypes = ['apiUrlValidation'];
+	private $guestTypes = array('apiUrlValidation');
 
 	/**
 	 * @inheritDoc
@@ -105,20 +105,20 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	 * Validates the correct plugin installation
 	 */
 	private function apiUrlValidation() {
-		$this->sendJsonResponse([
+		$this->sendJsonResponse(array(
 			'success' => true,
-			'apiUrl' => LinkHandler::getInstance()->getLink('WSCConnectAPI')
-		]);
+			'apiUrl' => LinkHandler::getInstance()->getLink('WSCConnectAPI', array('appendSession' => false))
+		));
 	}
 
 	/**
 	 * Validates the correct plugin installation and option setup
 	 */
 	private function apiDataValidation() {
-		$this->sendJsonResponse([
+		$this->sendJsonResponse(array(
 			'success' => true,
 			'appID' => WSC_CONNECT_APP_ID
-		]);
+		));
 	}
 
 	/**
@@ -193,9 +193,9 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			$user = new UserProfile($user);
 			$wscConnectToken = StringUtil::getUUID();
 			
-			$userAction = new UserAction([new UserEditor($user->getDecoratedObject())], 'update', ['data' => [
+			$userAction = new UserAction(array(new UserEditor($user->getDecoratedObject())), 'update', array('data' => array(
 				'wscConnectToken' => $wscConnectToken
-			]]);
+			)));
 			$userAction->executeAction();
 		} else {
 			// log failed login attempt
@@ -205,21 +205,21 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 				ON DUPLICATE KEY UPDATE		attempts=attempts+1,
 											time = ?";
 			$statement = WCF::getDB()->prepareStatement($sql);
-			$statement->execute([
+			$statement->execute(array(
 				$username,
 				1,
 				TIME_NOW,
 				TIME_NOW
-			]);
+			));
 		}
 
-		$this->sendJsonResponse([
+		$this->sendJsonResponse(array(
 			'success' => $loginSuccess,
 			'userID' => ($user !== null) ? $user->userID : 0,
 			'username' => ($user !== null) ? $user->username : '',
 			'avatar' => ($user !== null) ? $user->getAvatar()->getUrl(32) : '',
 			'wscConnectToken' => $wscConnectToken
-		]);
+		));
 	}
 
 	/**
@@ -232,14 +232,14 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			throw new AJAXException('Missing parameters', AJAXException::MISSING_PARAMETERS);
 		}
 
-		$userAction = new UserAction([$userID], 'update', ['data' => [
+		$userAction = new UserAction(array($userID), 'update', array('data' => array(
 			'wscConnectToken' => null
-		]]);
+		)));
 		$userAction->executeAction();
 
-		$this->sendJsonResponse([
+		$this->sendJsonResponse(array(
 			'success' => true
-		]);
+		));
 	}
 
 	/**
@@ -261,15 +261,15 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		WCF::getSession()->changeUser($user, true);
 
 		$notifications = UserNotificationHandler::getInstance()->getMixedNotifications();
-		$data = [];
+		$data = array();
 
 		foreach ($notifications['notifications'] as $notification) {
 			$data[] = $this->getNotification($notification);
 		}
 
-		$this->sendJsonResponse([
+		$this->sendJsonResponse(array(
 			'notifications' => $data
-		]);
+		));
 	}
 
 	/**
@@ -278,12 +278,12 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	 * @return	array
 	 */
 	private function getNotification($notification) {
-		return [
+		return array(
 			'message' => $notification['event']->getMessage(),
 			'avatar' => $notification['event']->getAuthor()->getAvatar()->getUrl(32),
 			'time' => $notification['event']->getNotification()->time,
 			'confirmed' => $notification['event']->isConfirmed(),
-			'link' => ($notification['event']->isConfirmed()) ? $notification['event']->getLink() : LinkHandler::getInstance()->getLink('NotificationConfirm', ['id' => $notification['notificationID']])
-		];
+			'link' => ($notification['event']->isConfirmed()) ? $notification['event']->getLink() : LinkHandler::getInstance()->getLink('NotificationConfirm', array('id' => $notification['notificationID']))
+		);
 	}
 }

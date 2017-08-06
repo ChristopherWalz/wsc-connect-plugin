@@ -46,8 +46,4 @@ disable:wcf.acp.option.wsc_connect_push_mode.disable]]></selectoptions>
 			</option>
 		</options>
 	</import>
-
-	<delete>
-		<option name="wsc_connect_enable_push" />
-	</delete>
 </data>

@@ -32,7 +32,7 @@ class WSCConnectNotificationsCronjob extends AbstractCronjob {
 			$statement = WCF::getDB()->prepareStatement($sql);
 			$statement->execute();
 			
-			$notifications = [];
+			$notifications = array();
 			while ($row = $statement->fetchArray()) {
 				$notifications[$row['wscConnectNotificationID']] = JSON::decode($row['data']);
 			}
@@ -48,7 +48,7 @@ class WSCConnectNotificationsCronjob extends AbstractCronjob {
 
 			// delete them from database
 			$condition = new PreparedStatementConditionBuilder();
-			$condition->add('wscConnectNotificationID IN (?)', [array_keys($notifications)]);
+			$condition->add('wscConnectNotificationID IN (?)', array(array_keys($notifications)));
 			$sql = "DELETE FROM	wcf".WCF_N."_wsc_connect_notifications ".$condition;
 			$statement = WCF::getDB()->prepareStatement($sql);
 			$statement->execute($condition->getParameters());

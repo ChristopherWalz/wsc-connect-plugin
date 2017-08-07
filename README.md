@@ -3,7 +3,7 @@ Feel free to submit pull requests to improve the plugin.
 
 Requirements
 ------------
-This plugin requires [WoltLab Suite Core](https://github.com/WoltLab/WCF) in version 3.0.4 or later.
+This plugin requires the [WoltLab Community Framework](https://github.com/WoltLab/WCF/tree/2.1) in version 2.0.17 or later.
 
 Your instance has to be accessible without security features like `.htaccess`/Basic Auth; this means you can't use this plugin within your testing environment if you're using commercial products by WoltLab within the same installation.
 

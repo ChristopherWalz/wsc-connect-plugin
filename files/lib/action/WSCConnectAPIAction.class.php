@@ -232,7 +232,13 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			throw new AJAXException('Missing parameters', AJAXException::MISSING_PARAMETERS);
 		}
 
-		$userAction = new UserAction(array($userID), 'update', array('data' => array(
+		$user = new User($userID);
+
+		if ($user->wscConnectToken != $this->wscConnectToken) {
+			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
+		}
+
+		$userAction = new UserAction(array(new UserEditor($user)), 'update', array('data' => array(
 			'wscConnectToken' => null
 		)));
 		$userAction->executeAction();

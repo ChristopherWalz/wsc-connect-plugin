@@ -21,6 +21,7 @@
 	</excludedpackages>
 
 	<instructions type="update" fromversion="1.0.4">
+		<instruction type="file" />
 		<instruction type="templateListener" />
 	</instructions>
 

@@ -37,6 +37,13 @@ disable:wcf.acp.option.wsc_connect_push_mode.disable]]></selectoptions>
 				<optiontype>password</optiontype>
 			</option>
 
+			<option name="wsc_connect_info_enable">
+				<categoryname>wsc_connect.general</categoryname>
+				<optiontype>boolean</optiontype>
+				<defaultvalue>1</defaultvalue>
+				<enableoptions>wsc_connect_info_time</enableoptions>
+			</option>
+
 			<option name="wsc_connect_info_time">
 				<categoryname>wsc_connect.general</categoryname>
 				<optiontype>integer</optiontype>

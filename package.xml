@@ -3,8 +3,8 @@
 	<packageinformation>
 		<packagename>WSC-Connect</packagename>
 		<packagedescription>WSC-Connect</packagedescription>
-		<version>3.0.5</version>
-		<date>2017-06-17</date>
+		<version>3.0.6</version>
+		<date>2017-08-06</date>
 	</packageinformation>
 
 	<authorinformation>
@@ -20,9 +20,14 @@
 		<excludedpackage version="3.1.0 Alpha 1">com.woltlab.wcf</excludedpackage>
 	</excludedpackages>
 
-	<instructions type="update" fromversion="1.0.4">
+	<instructions type="update" fromversion="3.0.5">
+		<instruction type="template" />
 		<instruction type="file" />
 		<instruction type="templateListener" />
+		<instruction type="option" />
+		<instruction type="userMenu" />
+		<instruction type="language" />
+		<instruction type="sql" run="standalone">update.sql</instruction>
 	</instructions>
 
 	<instructions type="install">

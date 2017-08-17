@@ -127,6 +127,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	private function login() {
 		$username = (isset($_REQUEST['username'])) ? mb_strtolower(StringUtil::trim($_REQUEST['username'])) : null;
 		$password = (isset($_REQUEST['password'])) ? StringUtil::trim($_REQUEST['password']) : null;
+		$device = (isset($_REQUEST['device'])) ? StringUtil::trim($_REQUEST['device']) : '';
 		$thirdPartyLogin = (isset($_REQUEST['thirdPartyLogin'])) ? filter_var($_REQUEST['thirdPartyLogin'], FILTER_VALIDATE_BOOLEAN) : false;
 
 		if ($username === null || $password === null) {
@@ -194,7 +195,9 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			$wscConnectToken = StringUtil::getUUID();
 			
 			$userAction = new UserAction(array(new UserEditor($user->getDecoratedObject())), 'update', array('data' => array(
-				'wscConnectToken' => $wscConnectToken
+				'wscConnectToken' => $wscConnectToken,
+				'wscConnectLoginDevice' => $device,
+				'wscConnectLoginTime' => TIME_NOW
 			)));
 			$userAction->executeAction();
 		} else {
@@ -239,7 +242,9 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		}
 
 		$userAction = new UserAction(array(new UserEditor($user)), 'update', array('data' => array(
-			'wscConnectToken' => null
+			'wscConnectToken' => null,
+			'wscConnectLoginDevice' => null,
+			'wscConnectLoginTime' => 0
 		)));
 		$userAction->executeAction();
 

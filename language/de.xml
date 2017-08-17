@@ -13,6 +13,7 @@
 		<item name="wcf.acp.option.wsc_connect_push_mode.batch"><![CDATA[Batch]]></item>
 		<item name="wcf.acp.option.wsc_connect_push_mode.disable"><![CDATA[Deaktiviert]]></item>
 		<item name="wcf.acp.option.module_wsc_connect"><![CDATA[WSC-Connect]]></item>
+		<item name="wcf.acp.option.wsc_connect_info_enable"><![CDATA[Info-Popup anzeigen]]></item>
 		<item name="wcf.acp.option.wsc_connect_info_time"><![CDATA[Cookie-Dauer für Info-Popup]]></item>
 		<item name="wcf.acp.option.wsc_connect_info_time.description"><![CDATA[Die Dauer in Tagen, für wie lange das Popup, welches über die Vorteile der App-Nutzung auf mobilen Android-Geräten informiert, nicht angezeigt wird, nachdem der Nutzer dieses geschlossen hat.]]></item>
 	</category>

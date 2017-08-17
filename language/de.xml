@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <language xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/maelstrom/language.xsd" languagecode="de">
 	<category name="wcf.acp.option">
 		<item name="wcf.acp.option.category.wsc_connect"><![CDATA[WSC-Connect]]></item>
@@ -21,10 +21,15 @@
 	<category name="wcf.wsc_connect">
 		<item name="wcf.wsc_connect.info"><![CDATA[Lade dir die kostenlose Android-App <strong>WSC-Connect</strong> herunter und erhalte Push-Nachrichten von <strong>{@$name}</strong> direkt auf dein Smartphone. Jetzt im Play-Store herunterladen!]]></item>
 		<item name="wcf.wsc_connect.wsc_connect"><![CDATA[WSC-Connect]]></item>
-		<item name="wcf.user.wsc_connect.thirdParty.title"><![CDATA[Drittanbieter-Login]]></item>
 		<item name="wcf.user.wsc_connect.thirdParty.label"><![CDATA[Drittanbieter-Auth-Token]]></item>
 		<item name="wcf.user.wsc_connect.thirdParty.description"><![CDATA[Bitte geben Sie dieses Token beim Login über die App anstelle eines Passworts an.]]></item>
 		<item name="wcf.user.wsc_connect.thirdParty.notConnected"><![CDATA[Sie sind nicht per Drittanbieter angemeldet. Nutzer Sie ihr Benutzername und Passwort, um sich in der App anzumelden.]]></item>
+		<item name="wcf.user.wsc_connect.tab.status"><![CDATA[Status]]></item>
+		<item name="wcf.user.wsc_connect.tab.thirdParty"><![CDATA[Drittanbieter-Login]]></item>
+		<item name="wcf.user.wsc_connect.status.notConnected"><![CDATA[Sie sind auf keinem Gerät über WSC-Connect angemeldet.<br />WSC-Connect jetzt im <a href="https://play.google.com/store/apps/details?id=wscconnect.android&pcampaignid=wsc-plugin-settings" class="externalURL"{if EXTERNAL_LINK_TARGET_BLANK} target="_blank"{/if}>Play-Store</a> herunterladen!]]></item>
+		<item name="wcf.user.wsc_connect.status.connected"><![CDATA[Sie sind mit dem Gerät <strong>{$device}</strong> über WSC-Connect angemeldet.<br /><strong>Letzter Login:</strong> {@$lastLogin|date}]]></item>
+		<item name="wcf.user.wsc_connect.status.logout"><![CDATA[Gerät <strong>{$device}</strong> ausloggen]]></item>
+		<item name="wcf.user.wsc_connect.status.logout.success"><![CDATA[Sie wurden erfolgreich von WSC-Connect ausgeloggt.]]></item>
 	</category>
 
 	<category name="wcf.user.menu">

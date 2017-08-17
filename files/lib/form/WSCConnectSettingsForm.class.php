@@ -1,5 +1,5 @@
 <?php
-namespace wcf\page;
+namespace wcf\form;
 use wcf\util\StringUtil;
 use wcf\system\menu\user\UserMenu;
 use wcf\data\user\UserProfile;
@@ -12,7 +12,7 @@ use wcf\system\WCF;
  * @license	https://cwalz.de/index.php/TermsOfLicense
  * @package	de.cwalz.wscConnect
  */
-class WSCConnectSettingsPage extends AbstractPage {
+class WSCConnectSettingsForm extends AbstractForm {
 	/**
 	 * @inheritDoc
 	 */
@@ -28,6 +28,12 @@ class WSCConnectSettingsPage extends AbstractPage {
 	 * @var	string
 	 */
 	private $wscConnectThirdPartyToken;
+
+	/**
+	 * Boolean, which indicates if the logout was successful
+	 * @var	boolean
+	 */
+	private $logoutSuccess = false;
 
 	/**
 	 * @inheritDoc
@@ -51,6 +57,24 @@ class WSCConnectSettingsPage extends AbstractPage {
 	/**
 	 * @inheritDoc
 	 */
+	public function save() {
+		parent::save();
+		
+		$userAction = new UserAction([new UserEditor(WCF::getUser())], 'update', ['data' => [
+			'wscConnectToken' => null,
+			'wscConnectLoginDevice' => null,
+			'wscConnectLoginTime' => 0
+		]]);
+		$userAction->executeAction();
+
+		$this->logoutSuccess = true;
+
+		$this->saved();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	public function show() {
 		// set active tab
 		UserMenu::getInstance()->setActiveMenuItem('wcf.user.menu.settings.wscConnect');
@@ -65,7 +89,8 @@ class WSCConnectSettingsPage extends AbstractPage {
 		parent::assignVariables();
 
 		WCF::getTPL()->assign([
-			'wscConnectThirdPartyToken' => $this->wscConnectThirdPartyToken
+			'wscConnectThirdPartyToken' => $this->wscConnectThirdPartyToken,
+			'logoutSuccess' => $this->logoutSuccess
 		]);
 	}
 }

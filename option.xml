@@ -51,6 +51,12 @@ disable:wcf.acp.option.wsc_connect_push_mode.disable]]></selectoptions>
 				<minvalue>1</minvalue>
 				<suffix>days</suffix>
 			</option>
+
+			<option name="wsc_connect_silent_login">
+				<categoryname>wsc_connect.general</categoryname>
+				<optiontype>boolean</optiontype>
+				<defaultvalue>0</defaultvalue>
+			</option>
 		</options>
 	</import>
 

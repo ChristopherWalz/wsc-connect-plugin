@@ -28,6 +28,7 @@
 		<instruction type="language">language/*.xml</instruction>
 		<instruction type="templateListener">templateListener.xml</instruction>
 		<instruction type="option">option.xml</instruction>
+		<instruction type="script">acp/update_de.cwalz.wsc-connect_2.0.6.php</instruction>
 	</instructions>
 
 	<instructions type="install">

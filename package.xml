@@ -28,6 +28,7 @@
 		<instruction type="userMenu" />
 		<instruction type="language" />
 		<instruction type="sql" run="standalone">update.sql</instruction>
+		<instruction type="script">acp/update_de.cwalz.wsc-connect_3.0.6.php</instruction>
 	</instructions>
 
 	<instructions type="install">

@@ -1,6 +1,6 @@
 <?php
 namespace wcf\form;
-use wcf\util\StringUtil;
+use wcf\util\PasswordUtil;
 use wcf\system\menu\user\UserMenu;
 use wcf\data\user\UserProfile;
 use wcf\data\user\UserAction;
@@ -43,7 +43,7 @@ class WSCConnectSettingsForm extends AbstractForm {
 
 		// check if this is athird party login and if we need to generate a token
 		if (WCF::getUser()->authData && !WCF::getUser()->wscConnectThirdPartyToken) {
-			$this->wscConnectThirdPartyToken = StringUtil::getUUID();
+			$this->wscConnectThirdPartyToken = PasswordUtil::getRandomPassword(36);
 			
 			$userAction = new UserAction([new UserEditor(WCF::getUser())], 'update', ['data' => [
 				'wscConnectThirdPartyToken' => $this->wscConnectThirdPartyToken

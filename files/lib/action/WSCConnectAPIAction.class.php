@@ -2,6 +2,7 @@
 namespace wcf\action;
 use wcf\system\exception\AJAXException;
 use wcf\util\StringUtil;
+use wcf\util\PasswordUtil;
 use wcf\data\user\User;
 use wcf\data\user\UserProfile;
 use wcf\data\user\UserAction;
@@ -81,7 +82,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			}
 
 			// check app id and app secret
-			if ($appSecret !== WSC_CONNECT_APP_SECRET || $appID !== WSC_CONNECT_APP_ID) {
+			if (!PasswordUtil::secureCompare($appSecret, WSC_CONNECT_APP_SECRET) || !PasswordUtil::secureCompare($appID, WSC_CONNECT_APP_ID)) {
 				throw new AJAXException('Wrong credentials', AJAXException::INSUFFICIENT_PERMISSIONS);
 			}
 		}
@@ -192,7 +193,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 
 		if ($loginSuccess) {
 			$user = new UserProfile($user);
-			$wscConnectToken = StringUtil::getUUID();
+			$wscConnectToken = PasswordUtil::getRandomPassword(36);
 			
 			$userAction = new UserAction(array(new UserEditor($user->getDecoratedObject())), 'update', array('data' => array(
 				'wscConnectToken' => $wscConnectToken,
@@ -237,7 +238,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 
 		$user = new User($userID);
 
-		if ($user->wscConnectToken != $this->wscConnectToken) {
+		if (!PasswordUtil::secureCompare($user->wscConnectToken, $this->wscConnectToken)) {
 			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
 		}
 
@@ -265,7 +266,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 
 		$user = new User($userID);
 
-		if ($user->wscConnectToken != $this->wscConnectToken) {
+		if (!PasswordUtil::secureCompare($user->wscConnectToken, $this->wscConnectToken)) {
 			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
 		}
 

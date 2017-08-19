@@ -31,6 +31,17 @@
 		<instruction type="script">acp/update_de.cwalz.wsc-connect_3.0.6.php</instruction>
 	</instructions>
 
+	<instructions type="update" fromversion="1.0.4">
+		<instruction type="template" />
+		<instruction type="file" />
+		<instruction type="templateListener" />
+		<instruction type="option" />
+		<instruction type="userMenu" />
+		<instruction type="language" />
+		<instruction type="sql" run="standalone">update.sql</instruction>
+		<instruction type="script">acp/update_de.cwalz.wsc-connect_3.0.6.php</instruction>
+	</instructions>
+
 	<instructions type="install">
 		<instruction type="template" />
 		<instruction type="file" />

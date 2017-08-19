@@ -46,7 +46,7 @@ class WSCConnectSettingsForm extends AbstractForm {
 		// check if this is athird party login and if we need to generate a token
 		if (WCF::getUser()->authData && !WCF::getUser()->wscConnectThirdPartyToken) {
 			try {
-				$this->wscConnectThirdPartyToken = CryptoUtil::randomBytes(36);
+				$this->wscConnectThirdPartyToken = bin2hex(CryptoUtil::randomBytes(18));
 			} catch (CryptoException $e) {
 				// fallback to less secure uuid
 				$this->wscConnectThirdPartyToken = StringUtil::getUUID();

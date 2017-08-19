@@ -195,7 +195,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		if ($loginSuccess) {
 			$user = new UserProfile($user);
 			try {
-				$wscConnectToken = CryptoUtil::randomBytes(36);
+				$wscConnectToken = bin2hex(CryptoUtil::randomBytes(18));
 			} catch (CryptoException $e) {
 				// fallback to less secure uuid
 				$wscConnectToken = StringUtil::getUUID();

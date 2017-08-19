@@ -1,6 +1,8 @@
 <?php
 namespace wcf\form;
 use wcf\util\StringUtil;
+use wcf\util\CryptoUtil;
+use wcf\util\exception\CryptoException;
 use wcf\system\menu\user\UserMenu;
 use wcf\data\user\UserProfile;
 use wcf\data\user\UserAction;
@@ -43,7 +45,12 @@ class WSCConnectSettingsForm extends AbstractForm {
 
 		// check if this is athird party login and if we need to generate a token
 		if (WCF::getUser()->authData && !WCF::getUser()->wscConnectThirdPartyToken) {
-			$this->wscConnectThirdPartyToken = StringUtil::getUUID();
+			try {
+				$this->wscConnectThirdPartyToken = CryptoUtil::randomBytes(36);
+			} catch (CryptoException $e) {
+				// fallback to less secure uuid
+				$this->wscConnectThirdPartyToken = StringUtil::getUUID();
+			}
 			
 			$userAction = new UserAction([new UserEditor(WCF::getUser())], 'update', ['data' => [
 				'wscConnectThirdPartyToken' => $this->wscConnectThirdPartyToken

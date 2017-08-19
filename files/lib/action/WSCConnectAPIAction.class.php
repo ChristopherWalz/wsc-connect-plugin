@@ -2,6 +2,8 @@
 namespace wcf\action;
 use wcf\system\exception\AJAXException;
 use wcf\util\StringUtil;
+use wcf\util\CryptoUtil;
+use wcf\util\exception\CryptoException;
 use wcf\data\user\User;
 use wcf\data\user\UserProfile;
 use wcf\data\user\UserAction;
@@ -81,7 +83,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			}
 
 			// check app id and app secret
-			if ($appSecret !== WSC_CONNECT_APP_SECRET || $appID !== WSC_CONNECT_APP_ID) {
+			if (!CryptoUtil::secureCompare($appSecret, WSC_CONNECT_APP_SECRET) || !CryptoUtil::secureCompare($appID, WSC_CONNECT_APP_ID)) {
 				throw new AJAXException('Wrong credentials', AJAXException::INSUFFICIENT_PERMISSIONS);
 			}
 		}
@@ -192,7 +194,12 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 
 		if ($loginSuccess) {
 			$user = new UserProfile($user);
-			$wscConnectToken = StringUtil::getUUID();
+			try {
+				$wscConnectToken = CryptoUtil::randomBytes(36);
+			} catch (CryptoException $e) {
+				// fallback to less secure uuid
+				$wscConnectToken = StringUtil::getUUID();
+			}
 			
 			$userAction = new UserAction([new UserEditor($user->getDecoratedObject())], 'update', ['data' => [
 				'wscConnectToken' => $wscConnectToken,
@@ -237,7 +244,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 
 		$user = new User($userID);
 
-		if ($user->wscConnectToken != $this->wscConnectToken) {
+		if (!CryptoUtil::secureCompare($user->wscConnectToken, $this->wscConnectToken)) {
 			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
 		}
 
@@ -265,7 +272,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 
 		$user = new User($userID);
 
-		if ($user->wscConnectToken != $this->wscConnectToken) {
+		if (!CryptoUtil::secureCompare($user->wscConnectToken, $this->wscConnectToken)) {
 			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
 		}
 

@@ -24,7 +24,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	 * Each request has to have a valid user agent.
 	 * @var	string
 	 */
-	const USER_AGENT = 'WSC-Connect API';
+	const USER_AGENT = array('WSC-Connect API', 'WSC-Connect Mobile Browser 1.0');
 
 	/**
 	 * The maximum failed login attempts
@@ -48,7 +48,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	 * Method types in this array do not need to deliver a valid appID/appSecret. Used for validation of this installation.
 	 * @var	array
 	 */
-	private $guestTypes = array('apiUrlValidation');
+	private $guestTypes = array('apiUrlValidation', 'loginCookie');
 
 	/**
 	 * @inheritDoc
@@ -61,7 +61,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		}
 
 		// check user agent
-		if ($_SERVER['HTTP_USER_AGENT'] != self::USER_AGENT) {
+		if (!in_array($_SERVER['HTTP_USER_AGENT'], self::USER_AGENT)) {
 			throw new AJAXException('Access not allowed', AJAXException::INSUFFICIENT_PERMISSIONS);
 		}
 
@@ -120,6 +120,49 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			'success' => true,
 			'appID' => WSC_CONNECT_APP_ID
 		));
+	}
+
+	private function loginCookie() {
+		$username = (isset($_REQUEST['username'])) ? mb_strtolower(StringUtil::trim($_REQUEST['username'])) : null;
+		$password = (isset($_REQUEST['password'])) ? StringUtil::trim($_REQUEST['password']) : null;
+
+		// do the login again
+		$loginSuccess = true;
+		try {
+			$user = UserAuthenticationFactory::getInstance()->getUserAuthentication()->loginManually($username, $password);
+		}
+		catch (UserInputException $e) {
+			if ($e->getField() == 'username') {
+				try {
+					$user = EmailUserAuthentication::getInstance()->loginManually($username, $password);
+				}
+				catch (UserInputException $e2) {
+					$loginSuccess = false;
+				}
+			}
+			else {
+				$loginSuccess = false;
+			}
+		}
+
+		if ($loginSuccess) {
+			// this is important, otherwise people could try to login all the time
+			if (!PasswordUtil::secureCompare($user->wscConnectToken, $this->wscConnectToken)) {
+				throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
+			}
+
+			// success, set cookies and change user
+			UserAuthenticationFactory::getInstance()->getUserAuthentication()->storeAccessData($user, $username, $password);
+			WCF::getSession()->changeUser($user);
+
+			$this->sendJsonResponse([
+				'success' => true
+			]);
+		} else {
+			$this->sendJsonResponse([
+				'success' => false
+			]);
+		}
 	}
 
 	/**

@@ -13,6 +13,8 @@
 		<item name="wcf.acp.option.wsc_connect_push_mode.batch"><![CDATA[Batch]]></item>
 		<item name="wcf.acp.option.wsc_connect_push_mode.disable"><![CDATA[Disabled]]></item>
 		<item name="wcf.acp.option.module_wsc_connect"><![CDATA[WSC-Connect]]></item>
+		<item name="wcf.acp.option.wsc_connect_silent_login"><![CDATA[Enable Silent Login]]></item>
+		<item name="wcf.acp.option.wsc_connect_silent_login.description"><![CDATA[The user get's logged in automatically when he opens a notification through the mobile app.]]></item>
 		<item name="wcf.acp.option.wsc_connect_info_enable"><![CDATA[Show info popup]]></item>
 		<item name="wcf.acp.option.wsc_connect_info_time"><![CDATA[Cookie time for the info popup]]></item>
 		<item name="wcf.acp.option.wsc_connect_info_time.description"><![CDATA[Time in days, for how long the popup, which informs android users about the app, is not shown, after it has been closed by the user.]]></item>

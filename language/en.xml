@@ -20,6 +20,7 @@
 
 	<category name="wcf.wsc_connect">
 		<item name="wcf.wsc_connect.info"><![CDATA[Try the free Android app <strong>WSC-Connect</strong> and receive push notifications from <strong>{@$name}</strong> on your phone. Download it in the Play-Store now!]]></item>
+		<item name="wcf.wsc_connect.info.registered"><![CDATA[<strong>{@$name}</strong> is available on <strong>WSC-Connect</strong>. Click here to open the app.]]></item>
 		<item name="wcf.wsc_connect.wsc_connect"><![CDATA[WSC-Connect]]></item>
 		<item name="wcf.wsc_connect.thirdParty.label"><![CDATA[Third-Party-Auth-Token]]></item>
 		<item name="wcf.wsc_connect.thirdParty.description"><![CDATA[Please use this token to login into the app instead of a password.]]></item>

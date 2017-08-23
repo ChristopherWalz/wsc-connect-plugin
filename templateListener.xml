@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <data xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/templateListener.xsd">
-	<import>		
+	<import>
 		<templatelistener name="wscConnectJS">
 			<environment>user</environment>
 			<templatename>headIncludeJavaScript</templatename>
 			<eventname>javascriptInit</eventname>
-			<templatecode><![CDATA[{if MODULE_WSC_CONNECT && WSC_CONNECT_APP_ID && WSC_CONNECT_APP_SECRET && WSC_CONNECT_INFO_ENABLE && (!$__wcf->getUser()->userID || ($__wcf->getUser()->userID && !$__wcf->getUser()->wscConnectToken))}{include file=__wscConnectJS}{/if}]]></templatecode>
+			<templatecode><![CDATA[{if MODULE_WSC_CONNECT && WSC_CONNECT_APP_ID && WSC_CONNECT_APP_SECRET && WSC_CONNECT_INFO_ENABLE}{include file=__wscConnectJS}{/if}]]></templatecode>
 		</templatelistener>
 		<templatelistener name="wscConnect">
 			<environment>user</environment>
 			<templatename>footer</templatename>
 			<eventname>footer</eventname>
-			<templatecode><![CDATA[{if MODULE_WSC_CONNECT && WSC_CONNECT_APP_ID && WSC_CONNECT_APP_SECRET && WSC_CONNECT_INFO_ENABLE && (!$__wcf->getUser()->userID || ($__wcf->getUser()->userID && !$__wcf->getUser()->wscConnectToken))}{include file=__wscConnect}{/if}]]></templatecode>
+			<templatecode><![CDATA[{if MODULE_WSC_CONNECT && WSC_CONNECT_APP_ID && WSC_CONNECT_APP_SECRET && WSC_CONNECT_INFO_ENABLE}{include file=__wscConnect}{/if}]]></templatecode>
 		</templatelistener>
 	</import>
 
 	<delete>
-		<templatelistener name="extendedConversationsJS">
+		<templatelistener name="wscConnectJS">
 			<environment>user</environment>
 			<templatename>headIncludeJavaScript</templatename>
 			<eventname>javascriptInit</eventname>
 		</templatelistener>
-		<templatelistener name="extendedConversations">
+		<templatelistener name="wscConnect">
 			<environment>user</environment>
 			<templatename>footer</templatename>
 			<eventname>footer</eventname>

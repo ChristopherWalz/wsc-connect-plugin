@@ -5,19 +5,37 @@
 			<environment>user</environment>
 			<templatename>headInclude</templatename>
 			<eventname>javascriptInclude</eventname>
-			<templatecode><![CDATA[{if MODULE_WSC_CONNECT && WSC_CONNECT_APP_ID && WSC_CONNECT_APP_SECRET && WSC_CONNECT_INFO_ENABLE && (!$__wcf->getUser()->userID || ($__wcf->getUser()->userID && !$__wcf->getUser()->wscConnectToken))}<script data-relocate="true" src="{@$__wcf->getPath('wcf')}js/CW.WSCConnect.js"></script>{/if}]]></templatecode>
+			<templatecode><![CDATA[{if MODULE_WSC_CONNECT && WSC_CONNECT_APP_ID && WSC_CONNECT_APP_SECRET && WSC_CONNECT_INFO_ENABLE}<script data-relocate="true" src="{@$__wcf->getPath('wcf')}js/CW.WSCConnect.js"></script>{/if}]]></templatecode>
 		</templatelistener>
 		<templatelistener name="wscConnectJS">
 			<environment>user</environment>
 			<templatename>headInclude</templatename>
 			<eventname>javascriptInit</eventname>
-			<templatecode><![CDATA[{if MODULE_WSC_CONNECT && WSC_CONNECT_APP_ID && WSC_CONNECT_APP_SECRET && WSC_CONNECT_INFO_ENABLE && (!$__wcf->getUser()->userID || ($__wcf->getUser()->userID && !$__wcf->getUser()->wscConnectToken))}new CW.WSCConnect('{COOKIE_PREFIX}', {WSC_CONNECT_INFO_TIME});{/if}]]></templatecode>
+			<templatecode><![CDATA[{if MODULE_WSC_CONNECT && WSC_CONNECT_APP_ID && WSC_CONNECT_APP_SECRET && WSC_CONNECT_INFO_ENABLE}new CW.WSCConnect('{COOKIE_PREFIX}', {WSC_CONNECT_INFO_TIME});{/if}]]></templatecode>
 		</templatelistener>
 		<templatelistener name="wscConnect">
 			<environment>user</environment>
 			<templatename>footer</templatename>
 			<eventname>footer</eventname>
-			<templatecode><![CDATA[{if MODULE_WSC_CONNECT && WSC_CONNECT_APP_ID && WSC_CONNECT_APP_SECRET && WSC_CONNECT_INFO_ENABLE && (!$__wcf->getUser()->userID || ($__wcf->getUser()->userID && !$__wcf->getUser()->wscConnectToken))}{include file=__wscConnect}{/if}]]></templatecode>
+			<templatecode><![CDATA[{if MODULE_WSC_CONNECT && WSC_CONNECT_APP_ID && WSC_CONNECT_APP_SECRET && WSC_CONNECT_INFO_ENABLE}{include file=__wscConnect}{/if}]]></templatecode>
 		</templatelistener>
 	</import>
+
+	<delete>
+		<templatelistener name="wscConnectJSInclude">
+			<environment>user</environment>
+			<templatename>headInclude</templatename>
+			<eventname>javascriptInclude</eventname>
+		</templatelistener>
+		<templatelistener name="wscConnectJS">
+			<environment>user</environment>
+			<templatename>headInclude</templatename>
+			<eventname>javascriptInit</eventname>
+		</templatelistener>
+		<templatelistener name="wscConnect">
+			<environment>user</environment>
+			<templatename>footer</templatename>
+			<eventname>footer</eventname>
+		</templatelistener>
+	</delete>
 </data>

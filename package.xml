@@ -3,7 +3,7 @@
 	<packageinformation>
 		<packagename>WSC-Connect</packagename>
 		<packagedescription>WSC-Connect</packagedescription>
-		<version>2.0.6</version>
+		<version>2.0.7</version>
 		<date>2017-08-06</date>
 	</packageinformation>
 
@@ -20,26 +20,11 @@
 		<excludedpackage version="2.2.0 Alpha 1">com.woltlab.wcf</excludedpackage>
 	</excludedpackages>
 
-	<instructions type="update" fromversion="2.0.5">
-		<instruction type="sql" run="standalone">update.sql</instruction>
+	<instructions type="update" fromversion="2.0.6">
 		<instruction type="template">templates.tar</instruction>
 		<instruction type="file">files.tar</instruction>
-		<instruction type="userMenu">userMenu.xml</instruction>
 		<instruction type="language">language/*.xml</instruction>
 		<instruction type="templateListener">templateListener.xml</instruction>
-		<instruction type="option">option.xml</instruction>
-		<instruction type="script">acp/update_de.cwalz.wsc-connect_2.0.6.php</instruction>
-	</instructions>
-
-	<instructions type="update" fromversion="1.0.4">
-		<instruction type="sql" run="standalone">update.sql</instruction>
-		<instruction type="template">templates.tar</instruction>
-		<instruction type="file">files.tar</instruction>
-		<instruction type="userMenu">userMenu.xml</instruction>
-		<instruction type="language">language/*.xml</instruction>
-		<instruction type="templateListener">templateListener.xml</instruction>
-		<instruction type="option">option.xml</instruction>
-		<instruction type="script">acp/update_de.cwalz.wsc-connect_2.0.6.php</instruction>
 	</instructions>
 
 	<instructions type="install">

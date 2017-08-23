@@ -25,6 +25,7 @@
 		<instruction type="file" />
 		<instruction type="templateListener" />
 		<instruction type="language" />
+		<instruction type="option" />
 	</instructions>
 
 	<instructions type="install">

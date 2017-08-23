@@ -31,6 +31,7 @@
 		<item name="wcf.wsc_connect.status.connected"><![CDATA[You are connected with the device <strong>{$device}</strong>.<br /><strong>Last login:</strong> {@$lastLogin|date}]]></item>
 		<item name="wcf.wsc_connect.status.logout"><![CDATA[Logout from device {$device}]]></item>
 		<item name="wcf.wsc_connect.status.logout.success"><![CDATA[Successfully logged out from WSC-Connect.]]></item>
+		<item name="wcf.wsc_connect.crypto_exception"><![CDATA[WSC-Connect can not generate a secure token. Please contact the administrator.]]></item>
 	</category>
 
 	<category name="wcf.user.menu">

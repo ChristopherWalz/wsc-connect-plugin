@@ -240,8 +240,8 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			try {
 				$wscConnectToken = bin2hex(CryptoUtil::randomBytes(18));
 			} catch (CryptoException $e) {
-				// fallback to less secure uuid
-				$wscConnectToken = StringUtil::getUUID();
+				// can not proceed from here
+				throw new AJAXException('Can not generate a secure hash.');
 			}
 			
 			$userAction = new UserAction([new UserEditor($user->getDecoratedObject())], 'update', ['data' => [

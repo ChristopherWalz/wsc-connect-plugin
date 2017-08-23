@@ -4,6 +4,7 @@ use wcf\util\StringUtil;
 use wcf\util\CryptoUtil;
 use wcf\util\exception\CryptoException;
 use wcf\system\menu\user\UserMenu;
+use wcf\system\exception\NamedUserException;
 use wcf\data\user\UserProfile;
 use wcf\data\user\UserAction;
 use wcf\data\user\UserEditor;
@@ -43,13 +44,13 @@ class WSCConnectSettingsForm extends AbstractForm {
 	public function readData() {
 		parent::readData();
 
-		// check if this is athird party login and if we need to generate a token
+		// check if this is a third party login and if we need to generate a token
 		if (WCF::getUser()->authData && !WCF::getUser()->wscConnectThirdPartyToken) {
 			try {
 				$this->wscConnectThirdPartyToken = bin2hex(CryptoUtil::randomBytes(18));
 			} catch (CryptoException $e) {
-				// fallback to less secure uuid
-				$this->wscConnectThirdPartyToken = StringUtil::getUUID();
+				// show nicer exception
+				throw new NamedUserException(WCF::getLanguage()->get('wcf.wsc_connect.crypto_exception'));
 			}
 			
 			$userAction = new UserAction([new UserEditor(WCF::getUser())], 'update', ['data' => [

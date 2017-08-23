@@ -31,6 +31,7 @@
 		<item name="wcf.wsc_connect.status.connected"><![CDATA[Sie sind mit dem Gerät <strong>{$device}</strong> über WSC-Connect angemeldet.<br /><strong>Letzter Login:</strong> {@$lastLogin|date}]]></item>
 		<item name="wcf.wsc_connect.status.logout"><![CDATA[Gerät {$device} ausloggen]]></item>
 		<item name="wcf.wsc_connect.status.logout.success"><![CDATA[Sie wurden erfolgreich von WSC-Connect ausgeloggt.]]></item>
+		<item name="wcf.wsc_connect.crypto_exception"><![CDATA[WSC-Connect kann keinen sicheren Token generieren. Bitte wenden Sie sich an den Administrator.]]></item>
 	</category>
 
 	<category name="wcf.user.menu">

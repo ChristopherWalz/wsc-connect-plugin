@@ -23,7 +23,7 @@ use wcf\system\database\util\PreparedStatementConditionBuilder;
 class WSCConnectAPIAction extends AbstractAjaxAction {
 	/**
 	 * Each request has to have a valid user agent.
-	 * @var	string
+	 * @var	array
 	 */
 	private $userAgents = ['WSC-Connect API', 'WSC-Connect Mobile Browser 1.0'];
 

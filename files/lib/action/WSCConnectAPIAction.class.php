@@ -25,7 +25,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	 * Each request has to have a valid user agent.
 	 * @var	string
 	 */
-	const USER_AGENT = ['WSC-Connect API', 'WSC-Connect Mobile Browser 1.0'];
+	private $userAgents = ['WSC-Connect API', 'WSC-Connect Mobile Browser 1.0'];
 
 	/**
 	 * The maximum failed login attempts
@@ -62,7 +62,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		}
 
 		// check user agent
-		if (!in_array($_SERVER['HTTP_USER_AGENT'], self::USER_AGENT)) {
+		if (!in_array($_SERVER['HTTP_USER_AGENT'], $this->userAgents)) {
 			throw new AJAXException('Access not allowed', AJAXException::INSUFFICIENT_PERMISSIONS);
 		}
 

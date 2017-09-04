@@ -15,6 +15,8 @@ use wcf\system\WCF;
 use wcf\system\user\notification\UserNotificationHandler;
 use wcf\system\request\LinkHandler;
 use wcf\system\database\util\PreparedStatementConditionBuilder;
+use wcf\system\event\EventHandler;
+
 /**
  * @author 	Christopher Walz
  * @license	https://cwalz.de/index.php/TermsOfLicense
@@ -25,7 +27,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	 * Each request has to have a valid user agent.
 	 * @var	array
 	 */
-	private $userAgents = ['WSC-Connect API', 'WSC-Connect Mobile Browser 1.0'];
+	public $userAgents = ['WSC-Connect API', 'WSC-Connect Mobile Browser 1.0'];
 
 	/**
 	 * The maximum failed login attempts
@@ -49,7 +51,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	 * Method types in this array do not need to deliver a valid appID/appSecret. Used for validation of this installation.
 	 * @var	array
 	 */
-	private $guestTypes = ['apiUrlValidation', 'loginCookie'];
+	public $guestTypes = ['apiUrlValidation', 'loginCookie'];
 
 	/**
 	 * @inheritDoc
@@ -95,10 +97,37 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	public function execute() {
 		parent::execute();
 
+		/* Extend this parameter to add your own methods to the API. The format should look like this:
+			$parameters['your.package.name'] = [
+				'object' => $yourListenerObject,
+				'types' => ['myAwesomeMethod1', 'myAwesomeMethod2']
+			];
+		*/
+		$parameters = [];
+
+		EventHandler::getInstance()->fireAction($this, 'beforeTypeCheck', $parameters);
+
+		$executed = false;
+
 		// execute method if it exists
 		if (method_exists($this, $this->type)) {
 			$this->{$this->type}();
-		} else {
+			$executed = true;
+			$this->executed();
+		} else if (!empty($parameters)) {
+			foreach ($parameters as $identifier) {
+				$key = array_search($this->type, $identifier['types']);
+
+				if ($key !== false) {
+					call_user_func([$identifier['object'], $identifier['types'][$key]]);
+					$executed = true;
+					$this->executed();
+					break;
+				}
+			}
+		}
+
+		if (!$executed) {
 			throw new AJAXException('Bad type', AJAXException::MISSING_PARAMETERS);
 		}
 	}
@@ -346,5 +375,12 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			'confirmed' => $notification['event']->isConfirmed(),
 			'link' => ($notification['event']->isConfirmed()) ? $notification['event']->getLink() : LinkHandler::getInstance()->getLink('NotificationConfirm', ['id' => $notification['notificationID']])
 		];
+	}
+
+	/**
+	 * Wrap method in a public method, so it's accessible through event listeners
+	 */
+	public function sendJsonResponse(array $data) {
+		parent::sendJsonResponse($data);
 	}
 }

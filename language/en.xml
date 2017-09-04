@@ -8,8 +8,11 @@
 		<item name="wcf.acp.option.wsc_connect_app_secret"><![CDATA[App-Secret]]></item>
 		<item name="wcf.acp.option.wsc_connect_app_secret.description"><![CDATA[You can find your App-Secret on the Dashboard on <a href="{@$__wcf->getPath()}acp/dereferrer.php?url={'https://www.wsc-connect.com'|rawurlencode}" class="externalURL">www.wsc-connect.com</a>.]]></item>
 		<item name="wcf.acp.option.wsc_connect_push_mode"><![CDATA[Delivery method for push messages]]></item>
-		<item name="wcf.acp.option.wsc_connect_push_mode.description"><![CDATA[The option "Immediately" sends push messages to the users smartphone immediately. This method can slow down some actions on your website. "Batch" collects all notifications and sends them via cronjob in regular intervals. Push messages arrive delayed, but your website will not be slowed down.]]></item>
+		<item name="wcf.acp.option.wsc_connect_push_mode.description"><![CDATA[<strong>Immediately in the background (recommended)</strong>: The notifications are sent immediately. This happens in the background and does not stress the main thread. Delay can occur in rare cases, when there are less active users on the website.<br />
+<strong>Immediately</strong>: Sends push messages to the users smartphone immediately. This method slows down some actions on your website, but it's the most reliable.<br />
+<strong>Batch</strong>: collects all notifications and sends them via cronjob in regular intervals. Push messages arrive delayed, but your website will not be slowed down.]]></item>
 		<item name="wcf.acp.option.wsc_connect_push_mode.immediately"><![CDATA[Immediately]]></item>
+		<item name="wcf.acp.option.wsc_connect_push_mode.immediatelyBackground"><![CDATA[Immediately in the background]]></item>
 		<item name="wcf.acp.option.wsc_connect_push_mode.batch"><![CDATA[Batch]]></item>
 		<item name="wcf.acp.option.wsc_connect_push_mode.disable"><![CDATA[Disabled]]></item>
 		<item name="wcf.acp.option.module_wsc_connect"><![CDATA[WSC-Connect]]></item>

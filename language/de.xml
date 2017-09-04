@@ -8,8 +8,11 @@
 		<item name="wcf.acp.option.wsc_connect_app_secret"><![CDATA[App-Secret]]></item>
 		<item name="wcf.acp.option.wsc_connect_app_secret.description"><![CDATA[Ihr App-Secret finden Sie im Dashboard auf <a href="{@$__wcf->getPath()}acp/dereferrer.php?url={'https://www.wsc-connect.com'|rawurlencode}" class="externalURL">www.wsc-connect.com</a>.]]></item>
 		<item name="wcf.acp.option.wsc_connect_push_mode"><![CDATA[Versandmethode für Push-Nachrichten]]></item>
-		<item name="wcf.acp.option.wsc_connect_push_mode.description"><![CDATA[Die Option "Sofort" versendet Benachrichtigunen für Nutzer direkt und diese erhalten eine Push-Benachrichtigung auf ihr Smartphone. Diese Methode kann einige Aktionen auf Ihrer Website verlangsamen. "Batch" sammelt alle Benachrichtigungen und sendet diese per Cronjob in regelmäßigen Abständen. Die Push-Benachrichtigungen kommen mit wenigen Minuten Verzögerungen an, dafür werden die Aktionen auf Ihrer Website nicht verlangsamt.]]></item>
+		<item name="wcf.acp.option.wsc_connect_push_mode.description"><![CDATA[<strong>Sofort im Hintergrund (empfohlen)</strong>: Die Benachrichtigungen werden sofort im Hintergrund versendet. Dadurch wird der Hauptthread nicht belastet und Anfragen von Nutzern werden schneller beantwortet. In seltenen Fällen kann es zu kleineren Verzögerungen kommen, wenn zu wenige Nutzer auf der Website aktiv sind.<br />
+<strong>Sofort</strong>: Die Benachrichtigungen für Nutzer werden direkt versendet und diese erhalten eine Push-Benachrichtigung auf ihr Smartphone. Diese Methode verlangsamt einige Aktionen auf Ihrer Website, ist aber die zuverlässigste. <br />
+<strong>Batch</strong>: Sammelt alle Benachrichtigungen und sendet diese per Cronjob in regelmäßigen Abständen. Die Push-Benachrichtigungen kommen mit wenigen Minuten Verzögerungen an, dafür werden die Aktionen auf Ihrer Website nicht verlangsamt. Zudem werden weniger API-Requests genutzt.]]></item>
 		<item name="wcf.acp.option.wsc_connect_push_mode.immediately"><![CDATA[Sofort]]></item>
+		<item name="wcf.acp.option.wsc_connect_push_mode.immediatelyBackground"><![CDATA[Sofort im Hintergrund]]></item>
 		<item name="wcf.acp.option.wsc_connect_push_mode.batch"><![CDATA[Batch]]></item>
 		<item name="wcf.acp.option.wsc_connect_push_mode.disable"><![CDATA[Deaktiviert]]></item>
 		<item name="wcf.acp.option.module_wsc_connect"><![CDATA[WSC-Connect]]></item>

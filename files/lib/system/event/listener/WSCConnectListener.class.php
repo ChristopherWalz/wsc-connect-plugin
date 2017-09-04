@@ -3,6 +3,8 @@ namespace wcf\system\event\listener;
 use wcf\util\HTTPRequest;
 use wcf\util\JSON;
 use wcf\data\user\User;
+use wcf\system\background\BackgroundQueueHandler;
+use wcf\system\background\job\WSCConnectBackgroundJob;
 use wcf\system\WCF;
 
 /**
@@ -16,6 +18,12 @@ class WSCConnectListener implements IParameterizedEventListener {
 	 * @var	string
 	 */
 	const API_URL = 'https://api.wsc-connect.com/notifications';
+
+	/**
+	 * Immediately push mode option in the background thread
+	 * @var	string
+	 */
+	const PUSH_MODE_IMMEDIATELY_BACKGROUND = 'immediatelyBackground';
 
 	/**
 	 * Immediately push mode option
@@ -65,6 +73,10 @@ class WSCConnectListener implements IParameterizedEventListener {
 			];
 
 			switch (WSC_CONNECT_PUSH_MODE) {
+				case self::PUSH_MODE_IMMEDIATELY_BACKGROUND:
+					$this->sendNotificationBackground($notification);
+				break;
+
 				case self::PUSH_MODE_IMMEDIATELY:
 					self::sendNotification($notification);
 				break;
@@ -97,6 +109,15 @@ class WSCConnectListener implements IParameterizedEventListener {
 		catch (\Exception $e) {
 			// Catch any exception and ignore it for now. Users can still look up their notifications in the app.
 		}
+	}
+
+	/**
+	 * Sends this notification in the background
+	 * @param 	array 	$notification
+	 */
+	private function sendNotificationBackground($notification) {
+		BackgroundQueueHandler::getInstance()->enqueueIn(new WSCConnectBackgroundJob($notification));
+		BackgroundQueueHandler::getInstance()->forceCheck();
 	}
 
 	/**

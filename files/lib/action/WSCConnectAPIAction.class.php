@@ -8,6 +8,7 @@ use wcf\data\user\User;
 use wcf\data\user\UserProfile;
 use wcf\data\user\UserAction;
 use wcf\data\user\UserEditor;
+use wcf\data\package\PackageCache;
 use wcf\system\user\authentication\UserAuthenticationFactory;
 use wcf\system\user\authentication\EmailUserAuthentication;
 use wcf\system\exception\UserInputException;
@@ -149,6 +150,36 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$this->sendJsonResponse([
 			'success' => true,
 			'appID' => WSC_CONNECT_APP_ID
+		]);
+	}
+
+	private function getConversations() {
+		$conversations = [];
+		$userID = (isset($_REQUEST['userID'])) ? intval($_REQUEST['userID']) : 0;
+
+		// conversation package not installed, return empty array
+		if (PackageCache::getInstance()->getPackageID('com.woltlab.wcf.conversation') === null) {
+			$this->sendJsonResponse([
+				'conversations' => $conversations
+			]);
+			return;
+		}
+
+		$sqlSelect = '  , (SELECT participantID FROM wcf'.WCF_N.'_conversation_to_user WHERE conversationID = conversation.conversationID AND participantID <> conversation.userID AND isInvisible = 0 ORDER BY username, participantID LIMIT 1) AS otherParticipantID
+				, (SELECT username FROM wcf'.WCF_N.'_conversation_to_user WHERE conversationID = conversation.conversationID AND participantID <> conversation.userID AND isInvisible = 0 ORDER BY username, participantID LIMIT 1) AS otherParticipant';
+
+		$objectList = new \wcf\data\conversation\UserConversationList($userID);
+		$objectList->sqlSelects .= $sqlSelect;
+		$objectList->sqlOrderBy = 'lastPostTime DESC';
+		$objectList->sqlLimit = 10;
+		$objectList->readObjects();
+
+		foreach ($objectList as $conversation) {
+			$conversations[] = $this->conversationToArray($conversation, $userID);
+		}
+
+		$this->sendJsonResponse([
+			'conversations' => $conversations
 		]);
 	}
 
@@ -361,7 +392,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$data = [];
 
 		foreach ($notifications['notifications'] as $notification) {
-			$data[] = $this->getNotification($notification);
+			$data[] = $this->notificationToArray($notification);
 		}
 
 		$this->sendJsonResponse([
@@ -371,10 +402,10 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 
 	/**
 	 * Returns a valid notification array
-	 * 
+	 *
 	 * @return	array
 	 */
-	private function getNotification($notification) {
+	private function notificationToArray($notification) {
 		return [
 			'message' => $notification['event']->getMessage(),
 			'avatar' => $notification['event']->getAuthor()->getAvatar()->getUrl(32),
@@ -383,6 +414,51 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			'link' => ($notification['event']->isConfirmed()) ? $notification['event']->getLink() : LinkHandler::getInstance()->getLink('NotificationConfirm', ['id' => $notification['notificationID']])
 		];
 	}
+
+	/**
+	 * Returns a valid conversation array
+	 *
+	 * @return	array
+	 */
+	private function conversationToArray($conversation, $currentUserID) {
+		if (!($conversation instanceof \wcf\data\conversation\ViewableConversation)) {
+			$conversation = new \wcf\data\conversation\ViewableConversation($conversation);
+		}
+
+		$array = [];
+		$array['conversationID'] = $conversation->conversationID;
+		$array['title'] = $conversation->getTitle();
+		$array['unread'] = $conversation->isNew();
+		$array['link'] = $conversation->getLink();
+		$array['time'] = $conversation->lastPostTime;
+		$array['participants'] = '';
+
+		$i = 0;
+		$count = count($conversation->getParticipantSummary());
+		foreach ($conversation->getParticipantSummary() as $participant) {
+			$i++;
+			$array['participants'] .= $participant->username;
+
+			if ($i < $count) {
+				$array['participants'] .= ', ';
+			}
+		}
+
+		if ($conversation->userID === $currentUserID) {
+			if ($conversation->participants > 1) {
+				$avatar = null;
+			} else {
+				$avatar = $conversation->getOtherParticipantProfile()->getAvatar()->getUrl(24);
+			}
+		} else {
+			$avatar = $conversation->getUserProfile()->getAvatar()->getUrl(24);
+		}
+
+		$array['avatar'] = $avatar;
+
+		return $array;
+	}
+
 
 	/**
 	 * Wrap method in a public method, so it's accessible through event listeners

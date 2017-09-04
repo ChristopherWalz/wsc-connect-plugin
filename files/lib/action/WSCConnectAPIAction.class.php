@@ -333,9 +333,16 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	}
 
 	/**
-	 * Fetches the latest mixed notifications of the given user
+	 * Wrapper method, to keep the API working. TODO Remove later.
 	 */
 	private function notifications() {
+		$this->getNotifications();
+	}
+
+	/**
+	 * Fetches the latest mixed notifications of the given user
+	 */
+	private function getNotifications() {
 		$userID = (isset($_REQUEST['userID'])) ? intval($_REQUEST['userID']) : 0;
 
 		if ($userID === 0 || $this->wscConnectToken === null) {

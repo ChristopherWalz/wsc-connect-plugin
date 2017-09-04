@@ -7,6 +7,7 @@ use wcf\data\user\User;
 use wcf\data\user\UserProfile;
 use wcf\data\user\UserAction;
 use wcf\data\user\UserEditor;
+use wcf\data\package\PackageCache;
 use wcf\system\user\authentication\UserAuthenticationFactory;
 use wcf\system\user\authentication\EmailUserAuthentication;
 use wcf\system\exception\UserInputException;
@@ -102,7 +103,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 				'types' => array('myAwesomeMethod1', 'myAwesomeMethod2')
 			);
 		*/
-		$parameters = [];
+		$parameters = array();
 
 		EventHandler::getInstance()->fireAction($this, 'beforeTypeCheck', $parameters);
 
@@ -151,6 +152,36 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		));
 	}
 
+	private function getConversations() {
+		$conversations = array();
+		$userID = (isset($_REQUEST['userID'])) ? intval($_REQUEST['userID']) : 0;
+
+		// conversation package not installed, return empty array
+		if (PackageCache::getInstance()->getPackageID('com.woltlab.wcf.conversation') === null) {
+			$this->sendJsonResponse(array(
+				'conversations' => $conversations
+			));
+			return;
+		}
+
+		$sqlSelect = '  , (SELECT participantID FROM wcf'.WCF_N.'_conversation_to_user WHERE conversationID = conversation.conversationID AND participantID <> conversation.userID AND isInvisible = 0 ORDER BY username, participantID LIMIT 1) AS otherParticipantID
+				, (SELECT username FROM wcf'.WCF_N.'_conversation_to_user WHERE conversationID = conversation.conversationID AND participantID <> conversation.userID AND isInvisible = 0 ORDER BY username, participantID LIMIT 1) AS otherParticipant';
+
+		$objectList = new \wcf\data\conversation\UserConversationList($userID);
+		$objectList->sqlSelects .= $sqlSelect;
+		$objectList->sqlOrderBy = 'lastPostTime DESC';
+		$objectList->sqlLimit = 10;
+		$objectList->readObjects();
+
+		foreach ($objectList as $conversation) {
+			$conversations[] = $this->conversationToArray($conversation, $userID);
+		}
+
+		$this->sendJsonResponse(array(
+			'conversations' => $conversations
+		));
+	}
+
 	private function loginCookie() {
 		$username = (isset($_REQUEST['username'])) ? mb_strtolower(StringUtil::trim($_REQUEST['username'])) : null;
 		$password = (isset($_REQUEST['password'])) ? StringUtil::trim($_REQUEST['password']) : null;
@@ -184,13 +215,13 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			UserAuthenticationFactory::getInstance()->getUserAuthentication()->storeAccessData($user, $username, $password);
 			WCF::getSession()->changeUser($user);
 
-			$this->sendJsonResponse([
+			$this->sendJsonResponse(array(
 				'success' => true
-			]);
+			));
 		} else {
-			$this->sendJsonResponse([
+			$this->sendJsonResponse(array(
 				'success' => false
-			]);
+			));
 		}
 	}
 
@@ -355,7 +386,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$data = array();
 
 		foreach ($notifications['notifications'] as $notification) {
-			$data[] = $this->getNotification($notification);
+			$data[] = $this->notificationToArray($notification);
 		}
 
 		$this->sendJsonResponse(array(
@@ -365,10 +396,10 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 
 	/**
 	 * Returns a valid notification array
-	 * 
+	 *
 	 * @return	array
 	 */
-	private function getNotification($notification) {
+	private function notificationToArray($notification) {
 		return array(
 			'message' => $notification['event']->getMessage(),
 			'avatar' => $notification['event']->getAuthor()->getAvatar()->getUrl(32),
@@ -377,6 +408,51 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			'link' => ($notification['event']->isConfirmed()) ? $notification['event']->getLink() : LinkHandler::getInstance()->getLink('NotificationConfirm', array('id' => $notification['notificationID']))
 		);
 	}
+
+	/**
+	 * Returns a valid conversation array
+	 *
+	 * @return	array
+	 */
+	private function conversationToArray($conversation, $currentUserID) {
+		if (!($conversation instanceof \wcf\data\conversation\ViewableConversation)) {
+			$conversation = new \wcf\data\conversation\ViewableConversation($conversation);
+		}
+
+		$array = array();
+		$array['conversationID'] = $conversation->conversationID;
+		$array['title'] = $conversation->getTitle();
+		$array['unread'] = $conversation->isNew();
+		$array['link'] = $conversation->getLink();
+		$array['time'] = $conversation->lastPostTime;
+		$array['participants'] = '';
+
+		$i = 0;
+		$count = count($conversation->getParticipantSummary());
+		foreach ($conversation->getParticipantSummary() as $participant) {
+			$i++;
+			$array['participants'] .= $participant->username;
+
+			if ($i < $count) {
+				$array['participants'] .= ', ';
+			}
+		}
+
+		if ($conversation->userID === $currentUserID) {
+			if ($conversation->participants > 1) {
+				$avatar = null;
+			} else {
+				$avatar = $conversation->getOtherParticipantProfile()->getAvatar()->getUrl(24);
+			}
+		} else {
+			$avatar = $conversation->getUserProfile()->getAvatar()->getUrl(24);
+		}
+
+		$array['avatar'] = $avatar;
+
+		return $array;
+	}
+
 
 	/**
 	 * Wrap method in a public method, so it's accessible through event listeners

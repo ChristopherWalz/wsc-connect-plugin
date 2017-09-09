@@ -1,5 +1,10 @@
 <?php
 namespace wcf\action;
+
+require_once WCF_DIR . 'lib/system/api/wsc-connect/autoload.php';
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\ExpiredException;
+
 use wcf\system\exception\AJAXException;
 use wcf\util\StringUtil;
 use wcf\util\CryptoUtil;
@@ -49,6 +54,12 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	private $wscConnectToken;
 
 	/**
+	 * The users decoded jwt token. If this is necessary for the type of action, provide it within the Bearer authorization header. An exception is thrown in case it is given in the request and not valid.
+	 * @var	stdClass
+	 */
+	private $decodedJWTToken;
+
+	/**
 	 * Method types in this array do not need to deliver a valid appID/appSecret. Used for validation of this installation.
 	 * @var	array
 	 */
@@ -74,6 +85,30 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$appSecret = (isset($_REQUEST['appSecret'])) ? StringUtil::trim($_REQUEST['appSecret']) : null;
 		$appID = (isset($_REQUEST['appID'])) ? StringUtil::trim($_REQUEST['appID']) : null;
 		$guestCall = in_array($this->type, $this->guestTypes);
+
+		// check for JWT token in authorization header
+		if (isset($_SERVER["HTTP_AUTHORIZATION"])) {
+			list($type, $token) = explode(" ", $_SERVER["HTTP_AUTHORIZATION"], 2);
+			if (strcasecmp($type, "Bearer") == 0) {
+				$key = file_get_contents(WCF_DIR . 'wsc_connect/key.pub');
+
+				try {
+					$this->decodedJWTToken = JWT::decode($token, $key, array('RS256'));
+
+					// only allow access tokens
+					if ($this->decodedJWTToken->tokenType !== 'access') {
+						throw new \Exception();
+					}
+
+					$guestCall = true;
+				// we have to distinguish between those two, so the client knows when to refresh the token
+				} catch (ExpiredException $e) {
+					throw new AJAXException('JWT expired', AJAXException::SESSION_EXPIRED);
+				} catch (\Exception $e) {
+					throw new AJAXException('JWT error');
+				}
+			}
+		}
 
 		if ($this->type === '' || (($appSecret === null || $appID === null) && !$guestCall)) {
 			throw new AJAXException('Missing parameters', AJAXException::INSUFFICIENT_PERMISSIONS);
@@ -154,16 +189,14 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	}
 
 	private function getConversations() {
-		$conversations = [];
-		$userID = (isset($_REQUEST['userID'])) ? intval($_REQUEST['userID']) : 0;
-
 		// conversation package not installed, return empty array
 		if (PackageCache::getInstance()->getPackageID('com.woltlab.wcf.conversation') === null) {
-			$this->sendJsonResponse([
-				'conversations' => $conversations
-			]);
+			$this->sendJsonResponse([]);
 			return;
 		}
+
+		$conversations = [];
+		$userID = (isset($this->decodedJWTToken->userID)) ? intval($this->decodedJWTToken->userID) : 0;
 
 		$sqlSelect = '  , (SELECT participantID FROM wcf'.WCF_N.'_conversation_to_user WHERE conversationID = conversation.conversationID AND participantID <> conversation.userID AND isInvisible = 0 ORDER BY username, participantID LIMIT 1) AS otherParticipantID
 				, (SELECT username FROM wcf'.WCF_N.'_conversation_to_user WHERE conversationID = conversation.conversationID AND participantID <> conversation.userID AND isInvisible = 0 ORDER BY username, participantID LIMIT 1) AS otherParticipant';
@@ -178,9 +211,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			$conversations[] = $this->conversationToArray($conversation, $userID);
 		}
 
-		$this->sendJsonResponse([
-			'conversations' => $conversations
-		]);
+		$this->sendJsonResponse($conversations);
 	}
 
 	private function loginCookie() {

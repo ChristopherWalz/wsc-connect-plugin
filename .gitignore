@@ -53,3 +53,4 @@ fabric.properties
 
 *.tar
 build.sh
+.DS_Store

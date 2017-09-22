@@ -5,6 +5,8 @@ require_once WCF_DIR . 'lib/system/api/wsc-connect/autoload.php';
 use \Firebase\JWT\JWT;
 use \Firebase\JWT\ExpiredException;
 
+use wcf\system\message\censorship\Censorship;
+use wcf\system\html\input\HtmlInputProcessor;
 use wcf\system\exception\AJAXException;
 use wcf\util\StringUtil;
 use wcf\util\CryptoUtil;
@@ -188,15 +190,126 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		]);
 	}
 
+	private function addConversationMessage() {
+		// conversation package not installed, return empty array
+		if (PackageCache::getInstance()->getPackageID('com.woltlab.wcf.conversation') === null) {
+			throw new AJAXException('package', AJAXException::ILLEGAL_LINK);
+		}
+
+		$conversationID = (isset($_REQUEST['id'])) ? intval($_REQUEST['id']) : 0;
+		$message = (isset($_REQUEST['message'])) ? StringUtil::trim($_REQUEST['message']) : null;
+		$userID = (isset($this->decodedJWTToken->userID)) ? intval($this->decodedJWTToken->userID) : 0;
+
+		if ($message === null) {
+			throw new AJAXException('Missing parameters', AJAXException::MISSING_PARAMETERS);
+		}
+
+		$conversation = \wcf\data\conversation\Conversation::getUserConversation($conversationID, $userID);
+
+		if ($conversation === null) {
+			throw new AJAXException('Conversation not found', AJAXException::ILLEGAL_LINK);
+		}
+
+		$user = new User($userID);
+		WCF::getSession()->changeUser($user, true);
+
+		if (!$conversation->canRead()) {
+			throw new AJAXException('Access not allowed', AJAXException::INSUFFICIENT_PERMISSIONS);
+		}
+
+		if (ENABLE_CENSORSHIP) {
+			$result = Censorship::getInstance()->test($message);
+			if ($result) {
+				throw new AJAXException('censorship', AJAXException::BAD_PARAMETERS, null, array_keys($result));
+			}
+		}
+
+		$maxTextLength = WCF::getSession()->getPermission('user.conversation.maxLength');
+		if (mb_strlen($message) > $maxTextLength) {
+			throw new AJAXException('length', AJAXException::BAD_PARAMETERS, null, intval($maxTextLength));
+		}
+
+		// save conversation message
+		$data = [
+			'time' => TIME_NOW,
+			'userID' => $user->userID,
+			'username' => $user->username,
+			'conversationID' => $conversation->conversationID
+		];
+
+		$htmlInputProcessor = new HtmlInputProcessor();
+		$htmlInputProcessor->process($message, 'com.woltlab.wcf.conversation.message');
+
+		$conversationData = [
+			'data' => $data,
+			'attachmentHandler' => null,
+			'htmlInputProcessor' => $htmlInputProcessor,
+			'conversation' => $conversation
+		];
+
+		$objectAction = new \wcf\data\conversation\message\ConversationMessageAction([], 'create', $conversationData);
+		$resultValues = $objectAction->executeAction();
+		$message = $resultValues['returnValues'];
+
+		// mark conversation as read
+		$objectAction = new \wcf\data\conversation\ConversationAction([$conversation], 'markAsRead');
+		$objectAction->executeAction();
+
+		$this->sendJsonResponse($this->conversationMessageToArray($message));
+	}
+
+	private function getConversationMessages() {
+		// conversation package not installed, return empty array
+		if (PackageCache::getInstance()->getPackageID('com.woltlab.wcf.conversation') === null) {
+			throw new AJAXException('package', AJAXException::ILLEGAL_LINK);
+		}
+
+		$offset = (isset($_REQUEST['offset'])) ? intval($_REQUEST['offset']) : 0;
+		$limit = (isset($_REQUEST['limit'])) ? intval($_REQUEST['limit']) : 10;
+		$conversationID = (isset($_REQUEST['id'])) ? intval($_REQUEST['id']) : 0;
+		$userID = (isset($this->decodedJWTToken->userID)) ? intval($this->decodedJWTToken->userID) : 0;
+		$conversation = \wcf\data\conversation\Conversation::getUserConversation($conversationID, $userID);
+
+		if ($conversation === null) {
+			throw new AJAXException('Conversation not found', AJAXException::ILLEGAL_LINK);
+		}
+
+		$user = new User($userID);
+		WCF::getSession()->changeUser($user, true);
+
+		if (!$conversation->canRead()) {
+			throw new AJAXException('Access not allowed', AJAXException::INSUFFICIENT_PERMISSIONS);
+		}
+
+		// get messages
+		$objectList = new \wcf\data\conversation\message\ViewableConversationMessageList();
+		$objectList->getConditionBuilder()->add('conversation_message.conversationID = ?', [$conversation->conversationID]);
+		$objectList->setConversation($conversation);
+		$objectList->sqlOffset = $offset;
+		$objectList->sqlLimit = $limit;
+		$objectList->readObjects();
+
+		$messages = [];
+		foreach ($objectList as $message) {
+			$messages[] = $this->conversationMessageToArray($message);
+		}
+
+		$this->sendJsonResponse([
+			'conversation' => $this->conversationToArray($conversation, $userID),
+			'messages' => $messages
+		]);
+	}
+
 	private function getConversations() {
 		// conversation package not installed, return empty array
 		if (PackageCache::getInstance()->getPackageID('com.woltlab.wcf.conversation') === null) {
-			$this->sendJsonResponse([]);
-			return;
+			throw new AJAXException('package', AJAXException::ILLEGAL_LINK);
 		}
 
 		$conversations = [];
 		$userID = (isset($this->decodedJWTToken->userID)) ? intval($this->decodedJWTToken->userID) : 0;
+		$offset = (isset($_REQUEST['offset'])) ? intval($_REQUEST['offset']) : 0;
+		$limit = (isset($_REQUEST['limit'])) ? intval($_REQUEST['limit']) : 10;
 
 		$sqlSelect = '  , (SELECT participantID FROM wcf'.WCF_N.'_conversation_to_user WHERE conversationID = conversation.conversationID AND participantID <> conversation.userID AND isInvisible = 0 ORDER BY username, participantID LIMIT 1) AS otherParticipantID
 				, (SELECT username FROM wcf'.WCF_N.'_conversation_to_user WHERE conversationID = conversation.conversationID AND participantID <> conversation.userID AND isInvisible = 0 ORDER BY username, participantID LIMIT 1) AS otherParticipant';
@@ -204,7 +317,8 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$objectList = new \wcf\data\conversation\UserConversationList($userID);
 		$objectList->sqlSelects .= $sqlSelect;
 		$objectList->sqlOrderBy = 'lastPostTime DESC';
-		$objectList->sqlLimit = 10;
+		$objectList->sqlOffset = $offset;
+		$objectList->sqlLimit = $limit;
 		$objectList->readObjects();
 
 		foreach ($objectList as $conversation) {
@@ -334,7 +448,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 				// can not proceed from here
 				throw new AJAXException('Can not generate a secure hash.');
 			}
-			
+
 			$userAction = new UserAction([new UserEditor($user->getDecoratedObject())], 'update', ['data' => [
 				'wscConnectToken' => $wscConnectToken,
 				'wscConnectLoginDevice' => $device,
@@ -490,6 +604,25 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		return $array;
 	}
 
+	/**
+	 * Returns a valid conversation message array
+	 *
+	 * @return	array
+	 */
+	private function conversationMessageToArray($message) {
+		if (!($message instanceof \wcf\data\conversation\message\ViewableConversationMessage)) {
+			$message = new \wcf\data\conversation\message\ViewableConversationMessage($message);
+		}
+
+		$array = [];
+		$array['messageID'] = $message->messageID;
+		$array['message'] = $message->getSimplifiedFormattedMessage();
+		$array['time'] = $message->time;
+		$array['username'] = $message->getUserProfile()->username;
+		$array['avatar'] = $message->getUserProfile()->getAvatar()->getUrl(24);
+
+		return $array;
+	}
 
 	/**
 	 * Wrap method in a public method, so it's accessible through event listeners

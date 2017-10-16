@@ -27,7 +27,7 @@
 		<item name="wcf.wsc_connect.wsc_connect"><![CDATA[WSC-Connect]]></item>
 		<item name="wcf.wsc_connect.thirdParty.label"><![CDATA[Drittanbieter-Auth-Token]]></item>
 		<item name="wcf.wsc_connect.thirdParty.description"><![CDATA[Bitte geben Sie dieses Token beim Login über die App anstelle eines Passworts an.]]></item>
-		<item name="wcf.wsc_connect.thirdParty.notConnected"><![CDATA[Sie sind nicht per Drittanbieter angemeldet. Nutzer Sie ihr Benutzername und Passwort, um sich in der App anzumelden.]]></item>
+		<item name="wcf.wsc_connect.thirdParty.notConnected"><![CDATA[Sie sind nicht per Drittanbieter angemeldet. Nutzen Sie ihren Benutzernamen und Ihr Passwort, um sich in der App anzumelden.]]></item>
 		<item name="wcf.wsc_connect.tab.status"><![CDATA[Status]]></item>
 		<item name="wcf.wsc_connect.tab.thirdParty"><![CDATA[Drittanbieter-Login]]></item>
 		<item name="wcf.wsc_connect.status.notConnected"><![CDATA[Sie sind auf keinem Gerät über WSC-Connect angemeldet.<br />WSC-Connect jetzt im <a href="https://play.google.com/store/apps/details?id=wscconnect.android&pcampaignid=wsc-plugin-settings" class="externalURL"{if EXTERNAL_LINK_TARGET_BLANK} target="_blank"{/if}>Play-Store</a> herunterladen!]]></item>

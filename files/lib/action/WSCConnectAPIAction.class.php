@@ -200,6 +200,9 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		));
 	}
 
+	/**
+	 * Adds a message to an existing conversation
+	 */
 	private function addConversationMessage() {
 		$this->validateConversationPackage();
 
@@ -262,6 +265,9 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$this->sendJsonResponse($this->conversationMessageToArray($message));
 	}
 
+	/**
+	 * Returns an array of messages for the given conversation
+	 */
 	private function getConversationMessages() {
 		$this->validateConversationPackage();
 
@@ -302,6 +308,9 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$this->sendJsonResponse($messages);
 	}
 
+	/**
+	 * Returns a single message
+	 */
 	private function getConversationMessage() {
 		$this->validateConversationPackage();
 
@@ -324,6 +333,9 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$this->sendJsonResponse($this->conversationMessageToArray($message, true));
 	}
 
+	/**
+	 * Returns an array of conversations
+	 */
 	private function getConversations() {
 		$this->validateConversationPackage();
 
@@ -349,6 +361,9 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$this->sendJsonResponse($conversations);
 	}
 
+	/**
+	 * Throws an exception, if the conversation package is not installed
+	 */
 	private function validateConversationPackage() {
 		// conversation package not installed, throw exception
 		if (PackageCache::getInstance()->getPackageID('com.woltlab.wcf.conversation') === null) {

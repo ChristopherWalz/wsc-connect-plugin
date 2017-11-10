@@ -10,6 +10,7 @@ use wcf\system\html\input\HtmlInputProcessor;
 use wcf\system\exception\AJAXException;
 use wcf\util\StringUtil;
 use wcf\util\CryptoUtil;
+use wcf\util\MessageUtil;
 use wcf\util\exception\CryptoException;
 use wcf\data\user\User;
 use wcf\data\user\UserProfile;
@@ -89,13 +90,13 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$guestCall = in_array($this->type, $this->guestTypes);
 
 		// check for JWT token in authorization header
-		if (isset($_SERVER["HTTP_AUTHORIZATION"])) {
+		if (!empty($_SERVER["HTTP_AUTHORIZATION"])) {
 			list($type, $token) = explode(" ", $_SERVER["HTTP_AUTHORIZATION"], 2);
 			if (strcasecmp($type, "Bearer") == 0) {
 				$key = file_get_contents(WCF_DIR . 'wsc_connect/key.pub');
 
 				try {
-					$this->decodedJWTToken = JWT::decode($token, $key, array('RS256'));
+					$this->decodedJWTToken = JWT::decode($token, $key, ['RS256']);
 
 					// only allow access tokens
 					if ($this->decodedJWTToken->tokenType !== 'access') {
@@ -191,10 +192,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	}
 
 	private function addConversationMessage() {
-		// conversation package not installed, return empty array
-		if (PackageCache::getInstance()->getPackageID('com.woltlab.wcf.conversation') === null) {
-			throw new AJAXException('package', AJAXException::ILLEGAL_LINK);
-		}
+		$this->validateConversationPackage();
 
 		$conversationID = (isset($_REQUEST['id'])) ? intval($_REQUEST['id']) : 0;
 		$message = (isset($_REQUEST['message'])) ? StringUtil::trim($_REQUEST['message']) : null;
@@ -213,7 +211,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$user = new User($userID);
 		WCF::getSession()->changeUser($user, true);
 
-		if (!$conversation->canRead()) {
+		if (!$conversation->canRead() || $conversation->isClosed) {
 			throw new AJAXException('Access not allowed', AJAXException::INSUFFICIENT_PERMISSIONS);
 		}
 
@@ -234,20 +232,21 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			'time' => TIME_NOW,
 			'userID' => $user->userID,
 			'username' => $user->username,
+			'message' => $message,
 			'conversationID' => $conversation->conversationID
 		];
 
 		$htmlInputProcessor = new HtmlInputProcessor();
 		$htmlInputProcessor->process($message, 'com.woltlab.wcf.conversation.message');
 
-		$conversationData = [
+		$messageData = [
 			'data' => $data,
 			'attachmentHandler' => null,
 			'htmlInputProcessor' => $htmlInputProcessor,
 			'conversation' => $conversation
 		];
 
-		$objectAction = new \wcf\data\conversation\message\ConversationMessageAction([], 'create', $conversationData);
+		$objectAction = new \wcf\data\conversation\message\ConversationMessageAction([], 'create', $messageData);
 		$resultValues = $objectAction->executeAction();
 		$message = $resultValues['returnValues'];
 
@@ -259,13 +258,10 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	}
 
 	private function getConversationMessages() {
-		// conversation package not installed, return empty array
-		if (PackageCache::getInstance()->getPackageID('com.woltlab.wcf.conversation') === null) {
-			throw new AJAXException('package', AJAXException::ILLEGAL_LINK);
-		}
+		$this->validateConversationPackage();
 
 		$offset = (isset($_REQUEST['offset'])) ? intval($_REQUEST['offset']) : 0;
-		$limit = (isset($_REQUEST['limit'])) ? intval($_REQUEST['limit']) : 10;
+		$limit = (isset($_REQUEST['limit'])) ? intval($_REQUEST['limit']) : 20;
 		$conversationID = (isset($_REQUEST['id'])) ? intval($_REQUEST['id']) : 0;
 		$userID = (isset($this->decodedJWTToken->userID)) ? intval($this->decodedJWTToken->userID) : 0;
 		$conversation = \wcf\data\conversation\Conversation::getUserConversation($conversationID, $userID);
@@ -294,22 +290,42 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			$messages[] = $this->conversationMessageToArray($message);
 		}
 
-		$this->sendJsonResponse([
-			'conversation' => $this->conversationToArray($conversation, $userID),
-			'messages' => $messages
-		]);
+		// mark conversation as read
+		$objectAction = new \wcf\data\conversation\ConversationAction([$conversation], 'markAsRead');
+		$objectAction->executeAction();
+
+		$this->sendJsonResponse($messages);
+	}
+
+	private function getConversationMessage() {
+		$this->validateConversationPackage();
+
+		$messageID = (isset($_REQUEST['id'])) ? intval($_REQUEST['id']) : 0;
+		$userID = (isset($this->decodedJWTToken->userID)) ? intval($this->decodedJWTToken->userID) : 0;
+		$message = \wcf\data\conversation\message\ViewableConversationMessage::getViewableConversationMessage($messageID);
+
+		if ($message === null) {
+			throw new AJAXException('Message not found', AJAXException::ILLEGAL_LINK);
+		}
+
+		$user = new User($userID);
+		WCF::getSession()->changeUser($user, true);
+
+		$conversation = $message->getConversation();
+		if (!$conversation->canRead()) {
+			throw new AJAXException('Access not allowed', AJAXException::INSUFFICIENT_PERMISSIONS);
+		}
+
+		$this->sendJsonResponse($this->conversationMessageToArray($message, true));
 	}
 
 	private function getConversations() {
-		// conversation package not installed, return empty array
-		if (PackageCache::getInstance()->getPackageID('com.woltlab.wcf.conversation') === null) {
-			throw new AJAXException('package', AJAXException::ILLEGAL_LINK);
-		}
+		$this->validateConversationPackage();
 
 		$conversations = [];
 		$userID = (isset($this->decodedJWTToken->userID)) ? intval($this->decodedJWTToken->userID) : 0;
 		$offset = (isset($_REQUEST['offset'])) ? intval($_REQUEST['offset']) : 0;
-		$limit = (isset($_REQUEST['limit'])) ? intval($_REQUEST['limit']) : 10;
+		$limit = (isset($_REQUEST['limit'])) ? intval($_REQUEST['limit']) : 20;
 
 		$sqlSelect = '  , (SELECT participantID FROM wcf'.WCF_N.'_conversation_to_user WHERE conversationID = conversation.conversationID AND participantID <> conversation.userID AND isInvisible = 0 ORDER BY username, participantID LIMIT 1) AS otherParticipantID
 				, (SELECT username FROM wcf'.WCF_N.'_conversation_to_user WHERE conversationID = conversation.conversationID AND participantID <> conversation.userID AND isInvisible = 0 ORDER BY username, participantID LIMIT 1) AS otherParticipant';
@@ -326,6 +342,13 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		}
 
 		$this->sendJsonResponse($conversations);
+	}
+
+	private function validateConversationPackage() {
+		// conversation package not installed, throw exception
+		if (PackageCache::getInstance()->getPackageID('com.woltlab.wcf.conversation') === null) {
+			throw new AJAXException('package', AJAXException::ILLEGAL_LINK);
+		}
 	}
 
 	private function loginCookie() {
@@ -386,8 +409,8 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 
 		// prevent brute forcing
 		$conditions = new PreparedStatementConditionBuilder();
-		$conditions->add("user = ?", array($username));
-		$conditions->add("attempts >= ?", array(self::MAX_LOGIN_ATTEMPTS));
+		$conditions->add("user = ?", [$username]);
+		$conditions->add("attempts >= ?", [self::MAX_LOGIN_ATTEMPTS]);
 
 		$sql = "SELECT user
 				FROM wcf".WCF_N."_wsc_connect_login_attempts
@@ -406,8 +429,8 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		if ($thirdPartyLogin) {
 			$conditions = new PreparedStatementConditionBuilder();
 
-			$conditions->add("username = ?", array($username));
-			$conditions->add("wscConnectThirdPartyToken = ?", array($password));
+			$conditions->add("username = ?", [$username]);
+			$conditions->add("wscConnectThirdPartyToken = ?", [$password]);
 
 			$sql = "SELECT *
 					FROM wcf".WCF_N."_user
@@ -519,16 +542,22 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	 * Fetches the latest mixed notifications of the given user
 	 */
 	private function getNotifications() {
-		$userID = (isset($_REQUEST['userID'])) ? intval($_REQUEST['userID']) : 0;
+		// support new direct get method from the app
+		if (isset($this->decodedJWTToken->userID)) {
+			$userID = intval($this->decodedJWTToken->userID);
+			$user = new User($userID);
+		} else if (isset($_REQUEST['userID'])) {
+			$userID = intval($_REQUEST['userID']);
 
-		if ($userID === 0 || $this->wscConnectToken === null) {
-			throw new AJAXException('Missing parameters', AJAXException::MISSING_PARAMETERS);
-		}
+			if ($userID == 0 || $this->wscConnectToken === null) {
+				throw new AJAXException('Missing parameters', AJAXException::MISSING_PARAMETERS);
+			}
 
-		$user = new User($userID);
+			$user = new User($userID);
 
-		if (!CryptoUtil::secureCompare($user->wscConnectToken, $this->wscConnectToken)) {
-			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
+			if (!CryptoUtil::secureCompare($user->wscConnectToken, $this->wscConnectToken)) {
+				throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
+			}
 		}
 
 		WCF::getSession()->changeUser($user, true);
@@ -540,9 +569,15 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			$data[] = $this->notificationToArray($notification);
 		}
 
-		$this->sendJsonResponse([
-			'notifications' => $data
-		]);
+		// support new direct get method from the app
+		$response = $data;
+		if (!isset($this->decodedJWTToken->userID)) {
+			$response  = [
+				'notifications' => $response
+			];
+		}
+
+		$this->sendJsonResponse($response);
 	}
 
 	/**
@@ -556,7 +591,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			'avatar' => $notification['event']->getAuthor()->getAvatar()->getUrl(32),
 			'time' => $notification['event']->getNotification()->time,
 			'confirmed' => $notification['event']->isConfirmed(),
-			'link' => ($notification['event']->isConfirmed()) ? $notification['event']->getLink() : LinkHandler::getInstance()->getLink('NotificationConfirm', ['id' => $notification['notificationID']])
+			'link' => ($notification['event']->isConfirmed()) ? MessageUtil::stripCrap($notification['event']->getLink()) : MessageUtil::stripCrap(LinkHandler::getInstance()->getLink('NotificationConfirm', ['id' => $notification['notificationID']]))
 		];
 	}
 
@@ -567,27 +602,18 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	 */
 	private function conversationToArray($conversation, $currentUserID) {
 		if (!($conversation instanceof \wcf\data\conversation\ViewableConversation)) {
-			$conversation = new \wcf\data\conversation\ViewableConversation($conversation);
+			$conversation = \wcf\data\conversation\ViewableConversation::getViewableConversation($conversation);
 		}
 
 		$array = [];
 		$array['conversationID'] = $conversation->conversationID;
 		$array['title'] = $conversation->getTitle();
 		$array['unread'] = $conversation->isNew();
-		$array['link'] = $conversation->getLink();
+		$array['link'] = MessageUtil::stripCrap($conversation->getLink());
 		$array['time'] = $conversation->lastPostTime;
-		$array['participants'] = '';
-
-		$i = 0;
-		$count = count($conversation->getParticipantSummary());
-		foreach ($conversation->getParticipantSummary() as $participant) {
-			$i++;
-			$array['participants'] .= $participant->username;
-
-			if ($i < $count) {
-				$array['participants'] .= ', ';
-			}
-		}
+		$array['participants'] = implode(", ", $conversation->getDecoratedObject()->getParticipantNames());
+		$array['isNew'] = $conversation->getDecoratedObject()->isNew();
+		$array['isClosed'] = boolval($conversation->isClosed);
 
 		if ($conversation->userID === $currentUserID) {
 			if ($conversation->participants > 1) {
@@ -609,14 +635,14 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	 *
 	 * @return	array
 	 */
-	private function conversationMessageToArray($message) {
+	private function conversationMessageToArray($message, $htmlMessage = false) {
 		if (!($message instanceof \wcf\data\conversation\message\ViewableConversationMessage)) {
-			$message = new \wcf\data\conversation\message\ViewableConversationMessage($message);
+			$message = \wcf\data\conversation\message\ViewableConversationMessage::getViewableConversationMessage($message->messageID);
 		}
 
 		$array = [];
 		$array['messageID'] = $message->messageID;
-		$array['message'] = $message->getSimplifiedFormattedMessage();
+		$array['message'] = ($htmlMessage) ? $message->getFormattedMessage() : $message->getSimplifiedFormattedMessage();
 		$array['time'] = $message->time;
 		$array['username'] = $message->getUserProfile()->username;
 		$array['avatar'] = $message->getUserProfile()->getAvatar()->getUrl(24);

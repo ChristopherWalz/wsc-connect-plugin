@@ -170,6 +170,17 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	}
 
 	/**
+	 * Returns the current installed plugin version
+	 */
+	private function getVersion() {
+		$plugin = PackageCache::getInstance()->getPackageByIdentifier('de.cwalz.wscConnect');
+
+		$this->sendJsonResponse(array(
+			'version' => $plugin->packageVersion
+		));
+	}
+
+	/**
 	 * Validates the correct plugin installation
 	 */
 	private function apiUrlValidation() {

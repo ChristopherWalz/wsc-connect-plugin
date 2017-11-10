@@ -3,8 +3,8 @@
 	<packageinformation>
 		<packagename>WSC-Connect</packagename>
 		<packagedescription>WSC-Connect</packagedescription>
-		<version>2.0.8</version>
-		<date>2017-08-31</date>
+		<version>2.0.9</version>
+		<date>2017-11-10</date>
 	</packageinformation>
 
 	<authorinformation>
@@ -19,6 +19,10 @@
 	<excludedpackages>
 		<excludedpackage version="2.2.0 Alpha 1">com.woltlab.wcf</excludedpackage>
 	</excludedpackages>
+
+	<instructions type="update" fromversion="2.0.8">
+		<instruction type="file">files.tar</instruction>
+	</instructions>
 
 	<instructions type="update" fromversion="2.0.7">
 		<instruction type="file">files.tar</instruction>

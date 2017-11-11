@@ -177,9 +177,9 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	private function getVersion() {
 		$plugin = PackageCache::getInstance()->getPackageByIdentifier('de.cwalz.wscConnect');
 
-		$this->sendJsonResponse(array(
+		$this->sendJsonResponse([
 			'version' => $plugin->packageVersion
-		));
+		]);
 	}
 
 	/**
@@ -202,6 +202,9 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		]);
 	}
 
+	/**
+	 * Adds a message to an existing conversation
+	 */
 	private function addConversationMessage() {
 		$this->validateConversationPackage();
 
@@ -268,6 +271,9 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$this->sendJsonResponse($this->conversationMessageToArray($message));
 	}
 
+	/**
+	 * Returns an array of messages for the given conversation
+	 */
 	private function getConversationMessages() {
 		$this->validateConversationPackage();
 
@@ -308,6 +314,9 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$this->sendJsonResponse($messages);
 	}
 
+	/**
+	 * Returns a single message
+	 */
 	private function getConversationMessage() {
 		$this->validateConversationPackage();
 
@@ -330,6 +339,9 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$this->sendJsonResponse($this->conversationMessageToArray($message, true));
 	}
 
+	/**
+	 * Returns an array of conversations
+	 */
 	private function getConversations() {
 		$this->validateConversationPackage();
 

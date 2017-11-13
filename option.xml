@@ -21,7 +21,7 @@
 			<option name="wsc_connect_push_mode">
 				<categoryname>wsc_connect.general</categoryname>
 				<optiontype>select</optiontype>
-				<defaultvalue><![CDATA[immediatelyBackground]]></defaultvalue>
+				<defaultvalue><![CDATA[immediately]]></defaultvalue>
 				<selectoptions><![CDATA[immediatelyBackground:wcf.acp.option.wsc_connect_push_mode.immediatelyBackground
 immediately:wcf.acp.option.wsc_connect_push_mode.immediately
 batch:wcf.acp.option.wsc_connect_push_mode.batch

@@ -6,7 +6,6 @@ use \Firebase\JWT\JWT;
 use \Firebase\JWT\ExpiredException;
 
 use wcf\system\message\censorship\Censorship;
-use wcf\system\html\input\HtmlInputProcessor;
 use wcf\system\exception\AJAXException;
 use wcf\util\StringUtil;
 use wcf\util\CryptoUtil;
@@ -250,13 +249,9 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			'conversationID' => $conversation->conversationID
 		];
 
-		$htmlInputProcessor = new HtmlInputProcessor();
-		$htmlInputProcessor->process($message, 'com.woltlab.wcf.conversation.message');
-
 		$messageData = [
 			'data' => $data,
 			'attachmentHandler' => null,
-			'htmlInputProcessor' => $htmlInputProcessor,
 			'conversation' => $conversation
 		];
 

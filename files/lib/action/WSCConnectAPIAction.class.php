@@ -64,7 +64,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	 * Method types in this array do not need to deliver a valid appID/appSecret. Used for validation of this installation.
 	 * @var	array
 	 */
-	public $guestTypes = array('apiUrlValidation', 'loginCookie');
+	public $guestTypes = array('apiUrlValidation', 'loginCookie', 'getAvailableTabs');
 
 	/**
 	 * @inheritDoc
@@ -170,14 +170,18 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	}
 
 	/**
-	 * Returns the current installed plugin version
+	 * Returns the available tabs to use
 	 */
-	private function getVersion() {
-		$plugin = PackageCache::getInstance()->getPackageByIdentifier('de.cwalz.wscConnect');
+	private function getAvailableTabs() {
+		$tabs = array('webview', 'notifications', 'messages');
 
-		$this->sendJsonResponse(array(
-			'version' => $plugin->packageVersion
-		));
+		if (PackageCache::getInstance()->getPackageID('com.woltlab.wcf.conversation') !== null) {
+			$tabs[] = 'conversations';
+		}
+
+		EventHandler::getInstance()->fireAction($this, 'availableTabs', $tabs);
+
+		$this->sendJsonResponse($tabs);
 	}
 
 	/**

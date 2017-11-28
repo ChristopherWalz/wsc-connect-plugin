@@ -87,9 +87,17 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$appID = (isset($_REQUEST['appID'])) ? StringUtil::trim($_REQUEST['appID']) : null;
 		$guestCall = in_array($this->type, $this->guestTypes);
 
-		// check for JWT token in authorization header
+		// fix for apache, which occasionally removes the HTTP_AUTH* headers
+		$authHeader = "";
 		if (!empty($_SERVER["HTTP_AUTHORIZATION"])) {
-			list($type, $token) = explode(" ", $_SERVER["HTTP_AUTHORIZATION"], 2);
+			$authHeader = $_SERVER["HTTP_AUTHORIZATION"];
+		} else if (!empty($_SERVER["HTTP_X_AUTHORIZATION"])) {
+			$authHeader = $_SERVER["HTTP_X_AUTHORIZATION"];
+		}
+
+		// check for JWT token in authorization header
+		if (!empty($authHeader)) {
+			list($type, $token) = explode(" ", $authHeader, 2);
 			if (strcasecmp($type, "Bearer") == 0) {
 				$key = file_get_contents(WCF_DIR . 'wsc_connect/key.pub');
 

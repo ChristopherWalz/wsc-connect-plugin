@@ -12,12 +12,16 @@
 		<authorurl>http://www.wsc-connect.com</authorurl>
 	</authorinformation>
 
+	<compatibility>
+		<api version="2017" />
+	</compatibility>
+
 	<requiredpackages>
 		<requiredpackage minversion="3.0.4">com.woltlab.wcf</requiredpackage>
 	</requiredpackages>
 
 	<excludedpackages>
-		<excludedpackage version="3.1.0 Alpha 1">com.woltlab.wcf</excludedpackage>
+		<excludedpackage version="3.2.0 Alpha 1">com.woltlab.wcf</excludedpackage>
 	</excludedpackages>
 
 	<instructions type="update" fromversion="3.0.8">

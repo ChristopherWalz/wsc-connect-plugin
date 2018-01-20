@@ -3,7 +3,7 @@
 	<packageinformation>
 		<packagename>WSC-Connect</packagename>
 		<packagedescription>WSC-Connect</packagedescription>
-		<version>3.0.9</version>
+		<version>3.0.10</version>
 		<date>2017-10-11</date>
 	</packageinformation>
 
@@ -16,28 +16,12 @@
 		<requiredpackage minversion="3.0.4">com.woltlab.wcf</requiredpackage>
 	</requiredpackages>
 
-	<excludedpackages>
-		<excludedpackage version="3.1.0 Alpha 1">com.woltlab.wcf</excludedpackage>
-	</excludedpackages>
+	<compatibility>
+		<api version="2018" />
+	</compatibility>
 
-	<instructions type="update" fromversion="3.0.8">
-		<instruction type="file" />
+	<instructions type="update" fromversion="3.0.9">
 		<instruction type="language" />
-		<instruction type="option" />
-	</instructions>
-
-	<instructions type="update" fromversion="3.0.7">
-		<instruction type="file" />
-		<instruction type="language" />
-		<instruction type="option" />
-	</instructions>
-
-	<instructions type="update" fromversion="3.0.6">
-		<instruction type="template" />
-		<instruction type="file" />
-		<instruction type="templateListener" />
-		<instruction type="language" />
-		<instruction type="option" />
 	</instructions>
 
 	<instructions type="install">

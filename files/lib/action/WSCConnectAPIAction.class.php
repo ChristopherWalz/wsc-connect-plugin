@@ -555,7 +555,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	 */
 	public static function encryptString($string, $secret) {
 		// only 8, because bytes are returned and bin2hex will result in 16 characters
-		$iv = bin2hex(openssl_random_pseudo_bytes(8));
+		$iv = bin2hex(CryptoUtil::randomBytes(8));
 		$encrypted = openssl_encrypt($string, 'AES-128-CBC', $secret, 0, $iv);
 
 		return base64_encode($encrypted . '::' . $iv);

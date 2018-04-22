@@ -1,4 +1,5 @@
 ALTER TABLE wcf1_user ADD wscConnectToken CHAR(36) DEFAULT NULL;
+ALTER TABLE wcf1_user ADD wscSecretToken CHAR(16) DEFAULT NULL;
 ALTER TABLE wcf1_user ADD wscConnectThirdPartyToken CHAR(36) DEFAULT NULL;
 ALTER TABLE wcf1_user ADD wscConnectLoginDevice VARCHAR(255) DEFAULT "";
 ALTER TABLE wcf1_user ADD wscConnectLoginTime INT(10) DEFAULT 0;

@@ -103,7 +103,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 
 				try {
 					$this->decodedJWTToken = JWT::decode($token, $key, array('RS256'));
-					
+
 					// only allow access tokens
 					if ($this->decodedJWTToken->tokenType !== 'access') {
 						throw new \Exception();
@@ -494,15 +494,21 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		}
 
 		$wscConnectToken = '';
+		$wscSecretToken = $user->wscSecretToken;
 
 		if ($loginSuccess) {
 			$user = new UserProfile($user);
 			$wscConnectToken = PasswordUtil::getRandomPassword(36);
-			
+
+			if (!$wscSecretToken) {
+				$wscSecretToken = PasswordUtil::getRandomPassword(16);
+			}
+
 			$userAction = new UserAction(array(new UserEditor($user->getDecoratedObject())), 'update', array('data' => array(
 				'wscConnectToken' => $wscConnectToken,
 				'wscConnectLoginDevice' => $device,
-				'wscConnectLoginTime' => TIME_NOW
+				'wscConnectLoginTime' => TIME_NOW,
+				'wscSecretToken' => $wscSecretToken
 			)));
 			$userAction->executeAction();
 		} else {
@@ -526,8 +532,22 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			'userID' => ($user !== null) ? $user->userID : 0,
 			'username' => ($user !== null) ? $user->username : '',
 			'avatar' => ($user !== null) ? $user->getAvatar()->getUrl(32) : '',
-			'wscConnectToken' => $wscConnectToken
+			'wscConnectToken' => $wscConnectToken,
+			'wscSecretToken' => $wscSecretToken
 		));
+	}
+
+	/**
+	 * Returns an openssl encrypted string, including the iv
+	 *
+	 * @param $string
+	 * @param $secret
+	 * @return string
+	 */
+	public static function encryptString($string, $secret) {
+		$iv = PasswordUtil::getRandomPassword(16);
+		$encrypted = openssl_encrypt($string, 'AES-128-CBC', $secret, 0, $iv);
+		return base64_encode($encrypted . '::' . $iv);
 	}
 
 	/**

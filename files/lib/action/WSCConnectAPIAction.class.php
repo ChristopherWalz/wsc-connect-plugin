@@ -492,6 +492,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		}
 
 		$wscConnectToken = '';
+		$wscSecretToken = $user->wscSecretToken;
 
 		if ($loginSuccess) {
 			$user = new UserProfile($user);
@@ -502,10 +503,21 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 				throw new AJAXException('Can not generate a secure hash.');
 			}
 
+
+			if (!$wscSecretToken) {
+				try {
+					$wscSecretToken = bin2hex(CryptoUtil::randomBytes(8));
+				} catch (CryptoException $e) {
+					// can not proceed from here
+					throw new AJAXException('Can not generate a secure hash.');
+				}
+			}
+
 			$userAction = new UserAction([new UserEditor($user->getDecoratedObject())], 'update', ['data' => [
 				'wscConnectToken' => $wscConnectToken,
 				'wscConnectLoginDevice' => $device,
-				'wscConnectLoginTime' => TIME_NOW
+				'wscConnectLoginTime' => TIME_NOW,
+				'wscSecretToken' => $wscSecretToken
 			]]);
 			$userAction->executeAction();
 		} else {
@@ -529,8 +541,24 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			'userID' => ($user !== null) ? $user->userID : 0,
 			'username' => ($user !== null) ? $user->username : '',
 			'avatar' => ($user !== null) ? $user->getAvatar()->getUrl(32) : '',
-			'wscConnectToken' => $wscConnectToken
+			'wscConnectToken' => $wscConnectToken,
+			'wscSecretToken' => $wscSecretToken
 		]);
+	}
+
+	/**
+	 * Returns an openssl encrypted string, including the iv
+	 *
+	 * @param $string
+	 * @param $secret
+	 * @return string
+	 */
+	public static function encryptString($string, $secret) {
+		// only 8, because bytes are returned and bin2hex will result in 16 characters
+		$iv = bin2hex(openssl_random_pseudo_bytes(8));
+		$encrypted = openssl_encrypt($string, 'AES-128-CBC', $secret, 0, $iv);
+
+		return base64_encode($encrypted . '::' . $iv);
 	}
 
 	/**

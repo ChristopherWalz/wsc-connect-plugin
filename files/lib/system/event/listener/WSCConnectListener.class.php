@@ -1,5 +1,6 @@
 <?php
 namespace wcf\system\event\listener;
+use wcf\action\WSCConnectAPIAction;
 use wcf\util\HTTPRequest;
 use wcf\util\JSON;
 use wcf\data\user\User;
@@ -51,29 +52,35 @@ class WSCConnectListener implements IParameterizedEventListener {
 			return;
 		}
 
-		$userIDs = [];
-
 		// Check if the users are logged in via the app. This could save as the HTTPRequest.
+		$users = [];
 		foreach ($parameters['recipientIDs'] as $userID) {
 			$user = new User($userID);
 
-			if ($user->wscConnectToken) {
-				$userIDs[] = $userID;
+			if ($user->wscConnectToken && $user->wscSecretToken) {
+				$users[$userID] = $user->wscSecretToken;
 			}
 		}
 
-		if (!empty($userIDs)) {
+		if (!empty($users)) {
 			$eventID = 0;
 			if ($parameters['notificationObject']) {
 				$eventID = $parameters['notificationObject']->getObjectID();
 			}
 
+			$userData = [];
+			foreach ($users as $userID => $wscSecretToken) {
+				$userData[] = [
+					'userID' => $userID,
+					'message' => WSCConnectAPIAction::encryptString($parameters['event']->getMessage(), $wscSecretToken),
+					'link' => WSCConnectAPIAction::encryptString($parameters['event']->getLink(), $wscSecretToken)
+				];
+			}
+
 			$notification = [
-				'userIDs' => $userIDs,
-				'message' => $parameters['event']->getMessage(),
+				'userData' => $userData,
 				'authorID' => $parameters['event']->getAuthor()->userID,
 				'time' => TIME_NOW,
-				'link' => $parameters['event']->getLink(),
 				'eventHash' => $parameters['event']->getEventHash(),
 				'eventName' => $parameters['eventName'],
 				'eventID' => $eventID

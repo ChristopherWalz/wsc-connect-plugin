@@ -2,6 +2,7 @@
 namespace wcf\action;
 
 require_once WCF_DIR . 'lib/system/api/wsc-connect/autoload.php';
+use function base64_encode;
 use \Firebase\JWT\JWT;
 use \Firebase\JWT\ExpiredException;
 
@@ -431,6 +432,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$username = (isset($_REQUEST['username'])) ? mb_strtolower(StringUtil::trim($_REQUEST['username'])) : null;
 		$password = (isset($_REQUEST['password'])) ? StringUtil::trim($_REQUEST['password']) : null;
 		$device = (isset($_REQUEST['device'])) ? StringUtil::trim($_REQUEST['device']) : '';
+		$publicKey = (!empty($_REQUEST['publicKey'])) ? StringUtil::trim($_REQUEST['publicKey']) : null;
 		$thirdPartyLogin = (isset($_REQUEST['thirdPartyLogin'])) ? filter_var($_REQUEST['thirdPartyLogin'], FILTER_VALIDATE_BOOLEAN) : false;
 
 		if ($username === null || $password === null) {
@@ -492,7 +494,6 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		}
 
 		$wscConnectToken = '';
-		$wscSecretToken = $user->wscSecretToken;
 
 		if ($loginSuccess) {
 			$user = new UserProfile($user);
@@ -503,21 +504,11 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 				throw new AJAXException('Can not generate a secure hash.');
 			}
 
-
-			if (!$wscSecretToken) {
-				try {
-					$wscSecretToken = bin2hex(CryptoUtil::randomBytes(8));
-				} catch (CryptoException $e) {
-					// can not proceed from here
-					throw new AJAXException('Can not generate a secure hash.');
-				}
-			}
-
 			$userAction = new UserAction([new UserEditor($user->getDecoratedObject())], 'update', ['data' => [
 				'wscConnectToken' => $wscConnectToken,
 				'wscConnectLoginDevice' => $device,
 				'wscConnectLoginTime' => TIME_NOW,
-				'wscSecretToken' => $wscSecretToken
+				'wscConnectPublicKey' => $publicKey
 			]]);
 			$userAction->executeAction();
 		} else {
@@ -541,24 +532,34 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			'userID' => ($user !== null) ? $user->userID : 0,
 			'username' => ($user !== null) ? $user->username : '',
 			'avatar' => ($user !== null) ? $user->getAvatar()->getUrl(32) : '',
-			'wscConnectToken' => $wscConnectToken,
-			'wscSecretToken' => $wscSecretToken
+			'wscConnectToken' => $wscConnectToken
 		]);
 	}
-
+	
 	/**
-	 * Returns an openssl encrypted string, including the iv
+	 * Returns the encrypted string with the given public key. We cannot use openssl_public_encrypt directly on the string, because of the length                   limitation of the method.
 	 *
-	 * @param $string
-	 * @param $secret
-	 * @return string
+	 * @param $string string the string to encrypt
+	 * @param $publicKey string the public key to encrypt the secret
+	 * @param $secret string a 8 byte random secret to encrypt the message
+	 * @return array
+	 * @throws CryptoException
 	 */
-	public static function encryptString($string, $secret) {
-		// only 8, because bytes are returned and bin2hex will result in 16 characters
+	public static function encryptString($string, $publicKey, $secret) {
+		// encrypt the actual message with openssl_encrypt using the given secret
 		$iv = bin2hex(CryptoUtil::randomBytes(8));
-		$encrypted = openssl_encrypt($string, 'AES-128-CBC', $secret, 0, $iv);
+		$encryptedString = openssl_encrypt($string, 'AES-128-CBC', $secret, OPENSSL_RAW_DATA, $iv);
 
-		return base64_encode($encrypted . '::' . $iv);
+		// encrypt the given secret and iv with the public key using openssl_public_encrypt
+		openssl_public_encrypt($secret, $encryptedSecret, $publicKey, OPENSSL_PKCS1_OAEP_PADDING);
+		openssl_public_encrypt($iv, $encryptedIv, $publicKey, OPENSSL_PKCS1_OAEP_PADDING);
+		
+		// return all three base64 encoded parameters, encrypted message, encrypted secret and the encrypted iv
+		return [
+			'string' => base64_encode($encryptedString),
+			'secret' => base64_encode($encryptedSecret),
+			'iv' => base64_encode($encryptedIv)
+		];
 	}
 
 	/**

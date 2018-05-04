@@ -527,12 +527,14 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			]);
 		}
 
+		$package = PackageCache::getInstance()->getPackageByIdentifier('de.cwalz.wscConnect');
 		$this->sendJsonResponse([
 			'success' => $loginSuccess,
 			'userID' => ($user !== null) ? $user->userID : 0,
 			'username' => ($user !== null) ? $user->username : '',
 			'avatar' => ($user !== null) ? $user->getAvatar()->getUrl(32) : '',
-			'wscConnectToken' => $wscConnectToken
+			'wscConnectToken' => $wscConnectToken,
+			'pluginVersion' => $package->packageVersion
 		]);
 	}
 	

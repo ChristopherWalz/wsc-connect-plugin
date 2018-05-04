@@ -1,1 +1,1 @@
-ALTER TABLE wcf1_user ADD wscSecretToken CHAR(16) DEFAULT NULL;
+ALTER TABLE wcf1_user ADD wscConnectPublicKey TEXT DEFAULT NULL;

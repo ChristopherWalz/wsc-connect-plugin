@@ -3,6 +3,7 @@ namespace wcf\system\event\listener;
 use wcf\action\WSCConnectAPIAction;
 use wcf\util\HTTPRequest;
 use wcf\util\JSON;
+use wcf\util\PasswordUtil;
 use wcf\data\user\User;
 use wcf\system\WCF;
 
@@ -47,8 +48,8 @@ class WSCConnectListener implements IParameterizedEventListener {
 		$users = array();
 		foreach ($parameters['recipientIDs'] as $userID) {
 			$user = new User($userID);
-			if ($user->wscConnectToken && $user->wscSecretToken) {
-				$users[$userID] = $user->wscSecretToken;
+			if ($user->wscConnectToken && $user->wscConnectPublicKey) {
+				$users[$userID] = $user->wscConnectPublicKey;
 			}
 		}
 
@@ -57,12 +58,15 @@ class WSCConnectListener implements IParameterizedEventListener {
 			if ($parameters['notificationObject']) {
 				$eventID = $parameters['notificationObject']->getObjectID();
 			}
-			$userData = [];
-			foreach ($users as $userID => $wscSecretToken) {
+
+			$userData = array();
+
+			foreach ($users as $userID => $wscConnectPublicKey) {
+				$secret = PasswordUtil::getRandomPassword(16);
 				$userData[] = [
 					'userID' => $userID,
-					'message' => WSCConnectAPIAction::encryptString($parameters['event']->getMessage(), $wscSecretToken),
-					'link' => WSCConnectAPIAction::encryptString($parameters['event']->getLink(), $wscSecretToken)
+					'message' => ($wscConnectPublicKey !== null) ? WSCConnectAPIAction::encryptString($parameters['event']->getMessage(), $wscConnectPublicKey, $secret) : $parameters['event']->getMessage(),
+					'link' => ($wscConnectPublicKey !== null) ? WSCConnectAPIAction::encryptString($parameters['event']->getLink(), $wscConnectPublicKey, $secret) : $parameters['event']->getLink()
 				];
 			}
 			$notification = [

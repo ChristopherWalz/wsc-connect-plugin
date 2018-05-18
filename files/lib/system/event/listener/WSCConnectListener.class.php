@@ -48,7 +48,7 @@ class WSCConnectListener implements IParameterizedEventListener {
 		$users = array();
 		foreach ($parameters['recipientIDs'] as $userID) {
 			$user = new User($userID);
-			if ($user->wscConnectToken && $user->wscConnectPublicKey) {
+			if ($user->wscConnectToken) {
 				$users[$userID] = $user->wscConnectPublicKey;
 			}
 		}

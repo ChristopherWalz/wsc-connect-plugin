@@ -308,6 +308,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$objectList->setConversation($conversation);
 		$objectList->sqlOffset = $offset;
 		$objectList->sqlLimit = $limit;
+		$objectList->sqlOrderBy = 'time DESC';
 		$objectList->readObjects();
 
 		$messages = [];

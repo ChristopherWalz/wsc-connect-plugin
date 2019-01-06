@@ -4,6 +4,7 @@
 		<usermenuitem name="wcf.user.menu.settings.wscConnect">
 			<controller>wcf\form\WSCConnectSettingsForm</controller>
 			<parent>wcf.user.menu.settings</parent>
+			<options>module_wsc_connect</options>
 		</usermenuitem>
 	</import>
 </data>

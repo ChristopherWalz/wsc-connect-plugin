@@ -62,21 +62,44 @@ class WSCConnectListener implements IParameterizedEventListener {
 			$userData = array();
 
 			foreach ($users as $userID => $wscConnectPublicKey) {
+				$decodedPublicKeys = json_decode($wscConnectPublicKey, true);
+				// check for valid json
+				if ($decodedPublicKeys === null) {
+					$decodedPublicKeys = array(
+						array(
+							'deviceID' => '',
+							'key' => $wscConnectPublicKey
+						)
+					);
+				}
+
 				$secret = PasswordUtil::getRandomPassword(16);
-				$userData[] = [
-					'userID' => $userID,
-					'message' => ($wscConnectPublicKey !== null) ? WSCConnectAPIAction::encryptString($parameters['event']->getMessage(), $wscConnectPublicKey, $secret) : $parameters['event']->getMessage(),
-					'link' => ($wscConnectPublicKey !== null) ? WSCConnectAPIAction::encryptString($parameters['event']->getLink(), $wscConnectPublicKey, $secret) : $parameters['event']->getLink()
-				];
+				foreach ($decodedPublicKeys as $publicKey) {
+					if (is_array($publicKey)) {
+						$key = $publicKey['key'];
+						$deviceID = $publicKey['deviceID'];
+					} else {
+						$key = $publicKey;
+						$deviceID = '';
+					}
+
+					$userData[] = array(
+						'userID' => $userID,
+						'message' => ($key !== null) ? WSCConnectAPIAction::encryptString($parameters['event']->getMessage(), $key, $secret) : $parameters['event']->getMessage(),
+						'link' => ($key !== null) ? WSCConnectAPIAction::encryptString($parameters['event']->getLink(), $key, $secret) : $parameters['event']->getLink(),
+						'deviceID' => $deviceID
+					);
+				}
 			}
-			$notification = [
+
+			$notification = array(
 				'userData' => $userData,
 				'authorID' => $parameters['event']->getAuthor()->userID,
 				'time' => TIME_NOW,
 				'eventHash' => $parameters['event']->getEventHash(),
 				'eventName' => $parameters['eventName'],
 				'eventID' => $eventID
-			];
+			);
 
 			switch (WSC_CONNECT_PUSH_MODE) {
 				case self::PUSH_MODE_IMMEDIATELY:

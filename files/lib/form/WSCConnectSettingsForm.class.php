@@ -24,6 +24,11 @@ class WSCConnectSettingsForm extends AbstractForm {
 	public $templateName = 'wscConnectSettings';
 
 	/**
+	 * @inheritDoc
+	 */
+	public $neededModules = ['MODULE_WSC_CONNECT'];
+
+	/**
 	 * The generated or to be generated token for the 3rd party login
 	 * @var	string
 	 */

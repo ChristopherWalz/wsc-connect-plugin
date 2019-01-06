@@ -501,11 +501,43 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			$user = new UserProfile($user);
 			$wscConnectToken = PasswordUtil::getRandomPassword(36);
 
+			$currentPublicKeys = array();
+			if ($user->wscConnectPublicKey) {
+				$decodedPublicKey = json_decode($user->wscConnectPublicKey);
+
+				// old format, just a string. Convert to json array with empty deviceID
+				if ($decodedPublicKey === null) {
+					$decodedPublicKey[] = array(
+						'deviceID' => '',
+						'key' => $user->wscConnectPublicKey
+					);
+				}
+
+				$currentPublicKeys = $decodedPublicKey;
+			}
+
+			// check if combination already exists
+			$inArray = false;
+			foreach($currentPublicKeys as $key) {
+				if (is_array($key) && $key['deviceID'] === $deviceID && $key['key'] === $publicKey) {
+					$inArray = true;
+					break;
+				}
+			}
+
+			// if not, add new key + device
+			if (!$inArray) {
+				$currentPublicKeys[] = array(
+					'deviceID' => $deviceID,
+					'key' => $publicKey
+				);
+			}
+
 			$userAction = new UserAction(array(new UserEditor($user->getDecoratedObject())), 'update', array('data' => array(
 				'wscConnectToken' => $wscConnectToken,
 				'wscConnectLoginDevice' => $device,
 				'wscConnectLoginTime' => TIME_NOW,
-				'wscConnectPublicKey' => $publicKey
+				'wscConnectPublicKey' => json_encode($currentPublicKeys)
 			)));
 			$userAction->executeAction();
 		} else {

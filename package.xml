@@ -22,6 +22,7 @@
 
 	<instructions type="update" fromversion="3.0.12">
 		<instruction type="file" />
+		<instruction type="userMenu" />
 	</instructions>
 
 	<instructions type="install">

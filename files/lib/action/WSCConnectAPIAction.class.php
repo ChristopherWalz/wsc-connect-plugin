@@ -434,6 +434,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$username = (isset($_REQUEST['username'])) ? mb_strtolower(StringUtil::trim($_REQUEST['username'])) : null;
 		$password = (isset($_REQUEST['password'])) ? StringUtil::trim($_REQUEST['password']) : null;
 		$device = (isset($_REQUEST['device'])) ? StringUtil::trim($_REQUEST['device']) : '';
+		$deviceID = (!empty($_REQUEST['deviceID'])) ? StringUtil::trim($_REQUEST['deviceID']) : '';
 		$publicKey = (!empty($_REQUEST['publicKey'])) ? StringUtil::trim($_REQUEST['publicKey']) : null;
 		$thirdPartyLogin = (isset($_REQUEST['thirdPartyLogin'])) ? filter_var($_REQUEST['thirdPartyLogin'], FILTER_VALIDATE_BOOLEAN) : false;
 

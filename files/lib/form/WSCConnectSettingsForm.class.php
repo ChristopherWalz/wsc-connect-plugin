@@ -1,14 +1,12 @@
 <?php
 namespace wcf\form;
-use wcf\util\StringUtil;
-use wcf\util\CryptoUtil;
-use wcf\util\exception\CryptoException;
-use wcf\system\menu\user\UserMenu;
-use wcf\system\exception\NamedUserException;
-use wcf\data\user\UserProfile;
 use wcf\data\user\UserAction;
 use wcf\data\user\UserEditor;
+use wcf\system\exception\NamedUserException;
+use wcf\system\menu\user\UserMenu;
 use wcf\system\WCF;
+use wcf\util\CryptoUtil;
+use wcf\util\exception\CryptoException;
 
 /**
  * @author 	Christopher Walz
@@ -29,7 +27,7 @@ class WSCConnectSettingsForm extends AbstractForm {
 	/**
 	 * @inheritDoc
 	 */
-	public $neededModules = ['MODULE_WSC_CONNECT'];	
+	public $neededModules = ['MODULE_WSC_CONNECT'];
 
 	/**
 	 * The generated or to be generated token for the 3rd party login
@@ -57,7 +55,7 @@ class WSCConnectSettingsForm extends AbstractForm {
 				// show nicer exception
 				throw new NamedUserException(WCF::getLanguage()->get('wcf.wsc_connect.crypto_exception'));
 			}
-			
+
 			$userAction = new UserAction([new UserEditor(WCF::getUser())], 'update', ['data' => [
 				'wscConnectThirdPartyToken' => $this->wscConnectThirdPartyToken
 			]]);
@@ -72,11 +70,10 @@ class WSCConnectSettingsForm extends AbstractForm {
 	 */
 	public function save() {
 		parent::save();
-		
+
 		$userAction = new UserAction([new UserEditor(WCF::getUser())], 'update', ['data' => [
 			'wscConnectToken' => null,
-			'wscConnectLoginDevice' => null,
-			'wscConnectLoginTime' => 0
+			'wscConnectLoginDevices' => []
 		]]);
 		$userAction->executeAction();
 
@@ -91,10 +88,10 @@ class WSCConnectSettingsForm extends AbstractForm {
 	public function show() {
 		// set active tab
 		UserMenu::getInstance()->setActiveMenuItem('wcf.user.menu.settings.wscConnect');
-		
+
 		parent::show();
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -103,7 +100,8 @@ class WSCConnectSettingsForm extends AbstractForm {
 
 		WCF::getTPL()->assign([
 			'wscConnectThirdPartyToken' => $this->wscConnectThirdPartyToken,
-			'logoutSuccess' => $this->logoutSuccess
+			'logoutSuccess' => $this->logoutSuccess,
+			'wscConnectLoginDevices' => (WCF::getUser()->wscConnectLoginDevices) ? json_decode(WCF::getUser()->wscConnectLoginDevices, true) : []
 		]);
 	}
 }

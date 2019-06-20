@@ -4,7 +4,7 @@
 		<packagename>WSC-Connect</packagename>
 		<packagedescription>WSC-Connect</packagedescription>
 		<version>3.0.13</version>
-		<date>2018-12-29</date>
+		<date>2019-06-20</date>
 	</packageinformation>
 
 	<authorinformation>
@@ -21,8 +21,10 @@
 	</compatibility>
 
 	<instructions type="update" fromversion="3.0.12">
+		<instruction type="template" />
 		<instruction type="file" />
-		<instruction type="userMenu" />
+		<instruction type="sql">update.sql</instruction>
+		<instruction type="script">acp/update_de.cwalz.wsc-connect_3.0.13.php</instruction>
 	</instructions>
 
 	<instructions type="install">

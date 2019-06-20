@@ -1,8 +1,7 @@
 ALTER TABLE wcf1_user ADD wscConnectToken CHAR(36) DEFAULT NULL;
 ALTER TABLE wcf1_user ADD wscConnectPublicKey TEXT DEFAULT NULL;
 ALTER TABLE wcf1_user ADD wscConnectThirdPartyToken CHAR(36) DEFAULT NULL;
-ALTER TABLE wcf1_user ADD wscConnectLoginDevice VARCHAR(255) DEFAULT "";
-ALTER TABLE wcf1_user ADD wscConnectLoginTime INT(10) DEFAULT 0;
+ALTER TABLE wcf1_user ADD wscConnectLoginDevices TEXT DEFAULT NULL;
 
 DROP TABLE IF EXISTS wcf1_wsc_connect_notifications;
 CREATE TABLE wcf1_wsc_connect_notifications (

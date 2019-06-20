@@ -31,8 +31,13 @@
 		<item name="wcf.wsc_connect.tab.status"><![CDATA[Status]]></item>
 		<item name="wcf.wsc_connect.tab.thirdParty"><![CDATA[Third-Party-Login]]></item>
 		<item name="wcf.wsc_connect.status.notConnected"><![CDATA[You are not connected on any device via WSC-Connect.<br />Download WSC-Connect in the <a href="https://play.google.com/store/apps/details?id=wscconnect.android&pcampaignid=wsc-plugin-settings" class="externalURL"{if EXTERNAL_LINK_TARGET_BLANK} target="_blank"{/if}>Play-Store</a> now!]]></item>
-		<item name="wcf.wsc_connect.status.connected"><![CDATA[You are connected with the device <strong>{$device}</strong>.<br /><strong>Last login:</strong> {@$lastLogin|date}]]></item>
-		<item name="wcf.wsc_connect.status.logout"><![CDATA[Logout from device {$device}]]></item>
+		<item name="wcf.wsc_connect.status.connected"><![CDATA[You are logged in with the following devices:
+			<ul class="nativeList">
+				{foreach from=$wscConnectLoginDevices item=device}
+					<li><strong>{$device['device']}</strong> (Last login: {@$device['time']|time})</li>
+				{/foreach}
+			</ul>]]></item>
+		<item name="wcf.wsc_connect.status.logout"><![CDATA[Logout from all devices]]></item>
 		<item name="wcf.wsc_connect.status.logout.success"><![CDATA[Successfully logged out from WSC-Connect.]]></item>
 		<item name="wcf.wsc_connect.crypto_exception"><![CDATA[WSC-Connect can not generate a secure token. Please contact the administrator.]]></item>
 	</category>

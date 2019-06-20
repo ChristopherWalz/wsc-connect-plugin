@@ -42,6 +42,11 @@ class WSCConnectSettingsForm extends AbstractForm {
 	private $logoutSuccess = false;
 
 	/**
+	 * @var array Logged in devices
+	 */
+	private $wscConnectLoginDevices = [];
+
+	/**
 	 * @inheritDoc
 	 */
 	public function readData() {
@@ -62,6 +67,15 @@ class WSCConnectSettingsForm extends AbstractForm {
 			$userAction->executeAction();
 		} else {
 			$this->wscConnectThirdPartyToken = WCF::getUser()->wscConnectThirdPartyToken;
+		}
+
+		if (WCF::getUser()->wscConnectLoginDevices) {
+			$this->wscConnectLoginDevices = json_decode(WCF::getUser()->wscConnectLoginDevices, true);
+
+			// show newest logins at the top
+			usort($this->wscConnectLoginDevices, function($a, $b) {
+				return $b['time'] - $a['time'];
+			});
 		}
 	}
 
@@ -101,7 +115,7 @@ class WSCConnectSettingsForm extends AbstractForm {
 		WCF::getTPL()->assign([
 			'wscConnectThirdPartyToken' => $this->wscConnectThirdPartyToken,
 			'logoutSuccess' => $this->logoutSuccess,
-			'wscConnectLoginDevices' => (WCF::getUser()->wscConnectLoginDevices) ? json_decode(WCF::getUser()->wscConnectLoginDevices, true) : []
+			'wscConnectLoginDevices' => $this->wscConnectLoginDevices
 		]);
 	}
 }

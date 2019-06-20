@@ -2,7 +2,6 @@
 namespace wcf\form;
 use wcf\util\PasswordUtil;
 use wcf\system\menu\user\UserMenu;
-use wcf\data\user\UserProfile;
 use wcf\data\user\UserAction;
 use wcf\data\user\UserEditor;
 use wcf\system\WCF;
@@ -41,6 +40,11 @@ class WSCConnectSettingsForm extends AbstractForm {
 	private $logoutSuccess = false;
 
 	/**
+	 * @var array Logged in devices
+	 */
+	private $wscConnectLoginDevices = [];
+
+	/**
 	 * @inheritDoc
 	 */
 	public function readData() {
@@ -49,13 +53,22 @@ class WSCConnectSettingsForm extends AbstractForm {
 		// check if this is athird party login and if we need to generate a token
 		if (WCF::getUser()->authData && !WCF::getUser()->wscConnectThirdPartyToken) {
 			$this->wscConnectThirdPartyToken = PasswordUtil::getRandomPassword(36);
-			
+
 			$userAction = new UserAction([new UserEditor(WCF::getUser())], 'update', ['data' => [
 				'wscConnectThirdPartyToken' => $this->wscConnectThirdPartyToken
 			]]);
 			$userAction->executeAction();
 		} else {
 			$this->wscConnectThirdPartyToken = WCF::getUser()->wscConnectThirdPartyToken;
+		}
+
+		if (WCF::getUser()->wscConnectLoginDevices) {
+			$this->wscConnectLoginDevices = json_decode(WCF::getUser()->wscConnectLoginDevices, true);
+
+			// show newest logins at the top
+			usort($this->wscConnectLoginDevices, function($a, $b) {
+				return $b['time'] - $a['time'];
+			});
 		}
 	}
 
@@ -64,11 +77,10 @@ class WSCConnectSettingsForm extends AbstractForm {
 	 */
 	public function save() {
 		parent::save();
-		
+
 		$userAction = new UserAction([new UserEditor(WCF::getUser())], 'update', ['data' => [
 			'wscConnectToken' => null,
-			'wscConnectLoginDevice' => null,
-			'wscConnectLoginTime' => 0
+			'wscConnectLoginDevices' => null
 		]]);
 		$userAction->executeAction();
 
@@ -83,10 +95,10 @@ class WSCConnectSettingsForm extends AbstractForm {
 	public function show() {
 		// set active tab
 		UserMenu::getInstance()->setActiveMenuItem('wcf.user.menu.settings.wscConnect');
-		
+
 		parent::show();
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -95,7 +107,8 @@ class WSCConnectSettingsForm extends AbstractForm {
 
 		WCF::getTPL()->assign([
 			'wscConnectThirdPartyToken' => $this->wscConnectThirdPartyToken,
-			'logoutSuccess' => $this->logoutSuccess
+			'logoutSuccess' => $this->logoutSuccess,
+			'wscConnectLoginDevices' => $this->wscConnectLoginDevices
 		]);
 	}
 }

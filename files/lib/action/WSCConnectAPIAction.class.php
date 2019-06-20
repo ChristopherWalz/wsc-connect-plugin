@@ -502,9 +502,10 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			$user = new UserProfile($user);
 			$wscConnectToken = PasswordUtil::getRandomPassword(36);
 
+			// check public keys
 			$currentPublicKeys = array();
 			if ($user->wscConnectPublicKey) {
-				$decodedPublicKey = json_decode($user->wscConnectPublicKey);
+				$decodedPublicKey = json_decode($user->wscConnectPublicKey, true);
 
 				// old format, just a string. Convert to json array with empty deviceID
 				if ($decodedPublicKey === null) {
@@ -534,10 +535,38 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 				);
 			}
 
+			// check login devices
+			$currentDevices = [];
+			if ($user->wscConnectLoginDevices) {
+				$currentDevices = json_decode($user->wscConnectLoginDevices, true);
+			}
+
+ 			// check if combination already exists
+			$inArray = false;
+			$index = -1;
+			foreach($currentDevices as $key => $deviceArray) {
+				if (is_array($deviceArray) && $deviceArray['deviceID'] === $deviceID) {
+					$inArray = true;
+					$index = $key;
+					break;
+				}
+			}
+
+ 			// if not, add new key + device, otherwise update
+			if (!$inArray) {
+				$currentDevices[] = [
+					'deviceID' => $deviceID,
+					'device' => $device,
+					'time' => TIME_NOW
+				];
+			} else {
+				$currentDevices[$index]['device'] = $device;
+				$currentDevices[$index]['time'] = TIME_NOW;
+			}
+
 			$userAction = new UserAction(array(new UserEditor($user->getDecoratedObject())), 'update', array('data' => array(
 				'wscConnectToken' => $wscConnectToken,
-				'wscConnectLoginDevice' => $device,
-				'wscConnectLoginTime' => TIME_NOW,
+				'wscConnectLoginDevices' => json_encode($currentDevices),
 				'wscConnectPublicKey' => json_encode($currentPublicKeys)
 			)));
 			$userAction->executeAction();
@@ -569,7 +598,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	}
 
 	/**
-	 * Returns the encrypted string with the given public key. We cannot use openssl_public_encrypt directly on the string, because of the length 
+	 * Returns the encrypted string with the given public key. We cannot use openssl_public_encrypt directly on the string, because of the length
 	 limitation of the method.
 	 *
 	 * @param $string string the string to encrypt
@@ -585,7 +614,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		// encrypt the given secret and iv with the public key using openssl_public_encrypt
 		openssl_public_encrypt($secret, $encryptedSecret, $publicKey, OPENSSL_PKCS1_OAEP_PADDING);
 		openssl_public_encrypt($iv, $encryptedIv, $publicKey, OPENSSL_PKCS1_OAEP_PADDING);
-		
+
 		// return all three base64 encoded parameters, encrypted message, encrypted secret and the encrypted iv
 		return array(
 			'string' => base64_encode($encryptedString),
@@ -599,6 +628,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 	 */
 	private function logout() {
 		$userID = (isset($_REQUEST['userID'])) ? intval($_REQUEST['userID']) : 0;
+		$deviceID = (!empty($_REQUEST['deviceID'])) ? StringUtil::trim($_REQUEST['deviceID']) : '';
 
 		if ($userID === 0 || $this->wscConnectToken === null) {
 			throw new AJAXException('Missing parameters', AJAXException::MISSING_PARAMETERS);
@@ -610,11 +640,27 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
 		}
 
-		$userAction = new UserAction(array(new UserEditor($user)), 'update', array('data' => array(
-			'wscConnectToken' => null,
-			'wscConnectLoginDevice' => null,
-			'wscConnectLoginTime' => 0
-		)));
+		// check if user is logged in
+		$currentDevices = [];
+		if ($user->wscConnectLoginDevices) {
+			$currentDevices = json_decode($user->wscConnectLoginDevices, true);
+
+			// remove device from array
+			$currentDevices = array_values(array_filter($currentDevices, function ($device) use ($deviceID) {
+				return $device['deviceID'] != $deviceID;
+			}));
+		}
+
+ 		$data = [
+			'wscConnectLoginDevices' => ($currentDevices) ? json_encode($currentDevices) : null
+		];
+
+ 		// only remove token when last device has been logged out
+		if (empty($currentDevices)) {
+			$data['wscConnectToken'] = null;
+		}
+
+ 		$userAction = new UserAction([new UserEditor($user)], 'update', ['data' => $data]);
 		$userAction->executeAction();
 
 		$this->sendJsonResponse(array(

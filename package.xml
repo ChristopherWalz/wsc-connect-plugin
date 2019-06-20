@@ -3,8 +3,8 @@
 	<packageinformation>
 		<packagename>WSC-Connect</packagename>
 		<packagedescription>WSC-Connect</packagedescription>
-		<version>2.0.14</version>
-		<date>2018-12-29</date>
+		<version>2.0.15</version>
+		<date>2019-06-20</date>
 	</packageinformation>
 
 	<authorinformation>
@@ -20,13 +20,11 @@
 		<excludedpackage version="2.2.0 Alpha 1">com.woltlab.wcf</excludedpackage>
 	</excludedpackages>
 
-	<instructions type="update" fromversion="2.0.13">
+	<instructions type="update" fromversion="2.0.14">
+		<instruction type="template">templates.tar</instruction>
 		<instruction type="file">files.tar</instruction>
-	</instructions>
-
-	<instructions type="update" fromversion="2.0.12">
-		<instruction type="file">files.tar</instruction>
-		<instruction type="userMenu">userMenu.xml</instruction>
+		<instruction type="sql">update.sql</instruction>
+		<instruction type="script">acp/update_de.cwalz.wsc-connect_2.0.15.php</instruction>
 	</instructions>
 
 	<instructions type="install">

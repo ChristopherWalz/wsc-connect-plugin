@@ -23,6 +23,7 @@
 	<instructions type="update" fromversion="2.0.14">
 		<instruction type="template">templates.tar</instruction>
 		<instruction type="file">files.tar</instruction>
+		<instruction type="language">language/*.xml</instruction>
 		<instruction type="sql">update.sql</instruction>
 		<instruction type="script">acp/update_de.cwalz.wsc-connect_2.0.15.php</instruction>
 	</instructions>

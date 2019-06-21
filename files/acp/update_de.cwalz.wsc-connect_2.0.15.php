@@ -17,7 +17,7 @@ $updateStatement = WCF::getDB()->prepareStatement($sql);
  while ($row = $statement->fetchArray()) {
 	$devices = [
 		[
-			'deviceID' => 'transfer'
+			'deviceID' => 'transfer',
 			'device' => $row['wscConnectLoginDevice'],
 			'time' => $row['wscConnectLoginTime']
 		]

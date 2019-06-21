@@ -1,5 +1,8 @@
 <?php
 namespace wcf\form;
+use function wcf\functions\exception\logThrowable;
+use wcf\system\event\listener\WSCConnectListener;
+use wcf\util\HTTPRequest;
 use wcf\util\PasswordUtil;
 use wcf\system\menu\user\UserMenu;
 use wcf\data\user\UserAction;
@@ -62,7 +65,7 @@ class WSCConnectSettingsForm extends AbstractForm {
 			$this->wscConnectThirdPartyToken = WCF::getUser()->wscConnectThirdPartyToken;
 		}
 
-		if (WCF::getUser()->wscConnectLoginDevices) {
+		if (WCF::getUser()->wscConnectLoginDevices && empty($_POST)) {
 			$this->wscConnectLoginDevices = json_decode(WCF::getUser()->wscConnectLoginDevices, true);
 
 			// show newest logins at the top
@@ -83,6 +86,21 @@ class WSCConnectSettingsForm extends AbstractForm {
 			'wscConnectLoginDevices' => null
 		]]);
 		$userAction->executeAction();
+
+		// logout via api
+		try {
+			$data = [
+				'appSecret' => WSC_CONNECT_APP_SECRET,
+				'appID' => WSC_CONNECT_APP_ID,
+				'userID' => WCF::getUser()->userID
+			];
+
+			$request = new HTTPRequest(WSCConnectListener::API_LOGOUT_URL, ['method' => 'POST', 'timeout' => 5], $data);
+			$request->execute();
+		} catch (\Exception $e) {
+			// log and ignore results
+			logThrowable($e);
+		}
 
 		$this->logoutSuccess = true;
 

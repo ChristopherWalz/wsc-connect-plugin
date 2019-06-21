@@ -14,6 +14,12 @@ use wcf\system\WCF;
  */
 class WSCConnectListener implements IParameterizedEventListener {
 	/**
+	 * The API-URL to logout users out
+	 * @var	string
+	 */
+	const API_LOGOUT_URL = 'https://api.wsc-connect.com/logout-user';
+
+	/**
 	 * The API-URL to push the notifications to.
 	 * @var	string
 	 */

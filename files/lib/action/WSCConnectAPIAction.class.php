@@ -110,7 +110,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 					}
 
 					$guestCall = true;
-				// we have to distinguish between those two, so the client knows when to refresh the token
+					// we have to distinguish between those two, so the client knows when to refresh the token
 				} catch (ExpiredException $e) {
 					throw new AJAXException('JWT expired', AJAXException::SESSION_EXPIRED);
 				} catch (\Exception $e) {
@@ -233,6 +233,12 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		}
 
 		$user = new User($userID);
+
+		// user is logged out
+		if ($user->wscConnectToken === null) {
+			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
+		}
+
 		WCF::getSession()->changeUser($user, true);
 
 		if (!$conversation->canRead() || $conversation->isClosed) {
@@ -294,6 +300,12 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		}
 
 		$user = new User($userID);
+
+		// user is logged out
+		if ($user->wscConnectToken === null) {
+			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
+		}
+
 		WCF::getSession()->changeUser($user, true);
 
 		if (!$conversation->canRead()) {
@@ -336,6 +348,12 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		}
 
 		$user = new User($userID);
+
+		// user is logged out
+		if ($user->wscConnectToken === null) {
+			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
+		}
+
 		WCF::getSession()->changeUser($user, true);
 
 		$conversation = $message->getConversation();
@@ -356,6 +374,13 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$userID = (isset($this->decodedJWTToken->userID)) ? intval($this->decodedJWTToken->userID) : 0;
 		$offset = (isset($_REQUEST['offset'])) ? intval($_REQUEST['offset']) : 0;
 		$limit = (isset($_REQUEST['limit'])) ? intval($_REQUEST['limit']) : 20;
+
+		$user = new User($userID);
+
+		// user is logged out
+		if ($user->wscConnectToken === null) {
+			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
+		}
 
 		$sqlSelect = '  , (SELECT participantID FROM wcf'.WCF_N.'_conversation_to_user WHERE conversationID = conversation.conversationID AND participantID <> conversation.userID AND isInvisible = 0 ORDER BY username, participantID LIMIT 1) AS otherParticipantID
 				, (SELECT username FROM wcf'.WCF_N.'_conversation_to_user WHERE conversationID = conversation.conversationID AND participantID <> conversation.userID AND isInvisible = 0 ORDER BY username, participantID LIMIT 1) AS otherParticipant';
@@ -541,7 +566,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 				$currentDevices = json_decode($user->wscConnectLoginDevices, true);
 			}
 
- 			// check if combination already exists
+			// check if combination already exists
 			$inArray = false;
 			$index = -1;
 			foreach($currentDevices as $key => $deviceArray) {
@@ -552,7 +577,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 				}
 			}
 
- 			// if not, add new key + device, otherwise update
+			// if not, add new key + device, otherwise update
 			if (!$inArray) {
 				$currentDevices[] = [
 					'deviceID' => $deviceID,
@@ -599,7 +624,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 
 	/**
 	 * Returns the encrypted string with the given public key. We cannot use openssl_public_encrypt directly on the string, because of the length
-	 limitation of the method.
+	limitation of the method.
 	 *
 	 * @param $string string the string to encrypt
 	 * @param $publicKey string the public key to encrypt the secret
@@ -651,16 +676,16 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			}));
 		}
 
- 		$data = [
-			'wscConnectLoginDevices' => ($currentDevices) ? json_encode($currentDevices) : null
+		$data = [
+			'wscConnectLoginDevices' => (!empty($currentDevices)) ? json_encode($currentDevices) : null
 		];
 
- 		// only remove token when last device has been logged out
+		// only remove token when last device has been logged out
 		if (empty($currentDevices)) {
 			$data['wscConnectToken'] = null;
 		}
 
- 		$userAction = new UserAction([new UserEditor($user)], 'update', ['data' => $data]);
+		$userAction = new UserAction([new UserEditor($user)], 'update', ['data' => $data]);
 		$userAction->executeAction();
 
 		$this->sendJsonResponse(array(
@@ -695,6 +720,11 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			if (!PasswordUtil::secureCompare($user->wscConnectToken, $this->wscConnectToken)) {
 				throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
 			}
+		}
+
+		// user is logged out
+		if ($user->wscConnectToken === null) {
+			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
 		}
 
 		WCF::getSession()->changeUser($user, true);

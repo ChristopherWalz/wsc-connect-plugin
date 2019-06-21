@@ -27,7 +27,3 @@ while ($row = $statement->fetchArray()) {
 	// transfer old columns to new column in correct format
 	$updateStatement->execute([json_encode($devices), $row['userID']]);
 }
-
-// drop old columns
-WCF::getDB()->getEditor()->dropColumn('wcf' . WCF_N . '_user', 'wscConnectLoginDevice');
-WCF::getDB()->getEditor()->dropColumn('wcf' . WCF_N . '_user', 'wscConnectLoginTime');

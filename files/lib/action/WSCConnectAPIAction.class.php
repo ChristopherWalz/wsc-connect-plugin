@@ -234,6 +234,12 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		}
 
 		$user = new User($userID);
+
+		// user is logged out
+		if ($user->wscConnectToken === null) {
+			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
+		}
+
 		WCF::getSession()->changeUser($user, true);
 
 		if (!$conversation->canRead() || $conversation->isClosed) {
@@ -295,6 +301,12 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		}
 
 		$user = new User($userID);
+
+		// user is logged out
+		if ($user->wscConnectToken === null) {
+			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
+		}
+
 		WCF::getSession()->changeUser($user, true);
 
 		if (!$conversation->canRead()) {
@@ -337,6 +349,12 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		}
 
 		$user = new User($userID);
+
+		// user is logged out
+		if ($user->wscConnectToken === null) {
+			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
+		}
+
 		WCF::getSession()->changeUser($user, true);
 
 		$conversation = $message->getConversation();
@@ -357,6 +375,13 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		$userID = (isset($this->decodedJWTToken->userID)) ? intval($this->decodedJWTToken->userID) : 0;
 		$offset = (isset($_REQUEST['offset'])) ? intval($_REQUEST['offset']) : 0;
 		$limit = (isset($_REQUEST['limit'])) ? intval($_REQUEST['limit']) : 20;
+
+		$user = new User($userID);
+
+		// user is logged out
+		if ($user->wscConnectToken === null) {
+			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
+		}
 
 		$sqlSelect = '  , (SELECT participantID FROM wcf'.WCF_N.'_conversation_to_user WHERE conversationID = conversation.conversationID AND participantID <> conversation.userID AND isInvisible = 0 ORDER BY username, participantID LIMIT 1) AS otherParticipantID
 				, (SELECT username FROM wcf'.WCF_N.'_conversation_to_user WHERE conversationID = conversation.conversationID AND participantID <> conversation.userID AND isInvisible = 0 ORDER BY username, participantID LIMIT 1) AS otherParticipant';
@@ -655,7 +680,7 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 		}
 
 		$data = [
-			'wscConnectLoginDevices' => json_encode($currentDevices)
+			'wscConnectLoginDevices' => (!empty($currentDevices)) ? json_encode($currentDevices) : null
 		];
 
 		// only remove token when last device has been logged out
@@ -698,6 +723,11 @@ class WSCConnectAPIAction extends AbstractAjaxAction {
 			if (!CryptoUtil::secureCompare($user->wscConnectToken, $this->wscConnectToken)) {
 				throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
 			}
+		}
+
+		// user is logged out
+		if ($user->wscConnectToken === null) {
+			throw new AJAXException('Wrong user credentials.', AJAXException::INSUFFICIENT_PERMISSIONS);
 		}
 
 		WCF::getSession()->changeUser($user, true);

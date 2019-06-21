@@ -1,13 +1,13 @@
 <?php
 namespace wcf\system\event\listener;
 use wcf\action\WSCConnectAPIAction;
-use wcf\util\CryptoUtil;
-use wcf\util\HTTPRequest;
-use wcf\util\JSON;
 use wcf\data\user\User;
 use wcf\system\background\BackgroundQueueHandler;
 use wcf\system\background\job\WSCConnectBackgroundJob;
 use wcf\system\WCF;
+use wcf\util\CryptoUtil;
+use wcf\util\HTTPRequest;
+use wcf\util\JSON;
 
 /**
  * @author 	Christopher Walz
@@ -15,6 +15,12 @@ use wcf\system\WCF;
  * @package	de.cwalz.wscConnect
  */
 class WSCConnectListener implements IParameterizedEventListener {
+	/**
+	 * The API-URL to logout users out
+	 * @var	string
+	 */
+	const API_LOGOUT_URL = 'https://api.wsc-connect.com/logout-user';
+
 	/**
 	 * The API-URL to push the notifications to.
 	 * @var	string

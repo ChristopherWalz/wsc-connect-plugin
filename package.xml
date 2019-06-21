@@ -23,6 +23,7 @@
 	<instructions type="update" fromversion="3.0.12">
 		<instruction type="template" />
 		<instruction type="file" />
+		<instruction type="language" />
 		<instruction type="sql">update.sql</instruction>
 		<instruction type="script">acp/update_de.cwalz.wsc-connect_3.0.13.php</instruction>
 	</instructions>

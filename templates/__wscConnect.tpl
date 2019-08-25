@@ -1,10 +1,10 @@
 {if !$__wcf->getUser()->wscConnectToken}
-	{assign var=url value="#^https?://#"|preg_replace:'':$__wcf->getPath()|rtrim:"/"}
+	{assign var=url value=$__wcf->getPath()|parse_url}
 	<script data-relocate="true">
 		require(['Language'], function (Language) {
 			Language.addObject({
-				'wcf.wsc_connect.info.ios': '{lang url=$url}wcf.wsc_connect.info.ios{/lang}',
-				'wcf.wsc_connect.info.android': '{lang url=$url}wcf.wsc_connect.info.android{/lang}'
+				'wcf.wsc_connect.info.ios': '{lang url=$url[host]}wcf.wsc_connect.info.ios{/lang}',
+				'wcf.wsc_connect.info.android': '{lang url=$url[host]}wcf.wsc_connect.info.android{/lang}'
 			});
 		});
 	</script>

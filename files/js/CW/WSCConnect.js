@@ -3,24 +3,34 @@
  * @license	http://www.cwalz.de/forum/index.php?page=TermsOfLicense
  * @package	de.cwalz.wscConnect
  */
-define(['WoltLabSuite/Core/Environment'], function(Environment) {
+define(['WoltLabSuite/Core/Environment', 'Language'], function(Environment, Language) {
 	"use strict";
-	
+
 	function WSCConnect() {}
 
 	WSCConnect.prototype = {
 		init: function(cookiePrefix, cookieTime) {
+			this.links = {
+				android: 'https://play.google.com/store/apps/details?id=wscconnect.android&pcampaignid=wsc-plugin',
+				ios: 'https://apps.apple.com/us/app/wsc-connect/id1462270360'
+			};
+			this.text = {
+				android: Language.get('wcf.wsc_connect.info.android'),
+				ios: Language.get('wcf.wsc_connect.info.ios')
+			};
 			this.cookieName = cookiePrefix + 'wscconnect';
 			this.cookieTime = parseInt(cookieTime);
 
 			var userAgent = window.navigator.userAgent.toLowerCase();
-			if (Environment.platform() === 'android' && 
+			if ((Environment.platform() === 'android' || Environment.platform() === 'ios') &&
 				userAgent.indexOf('wsc-connect mobile browser') === -1 &&
 				document.cookie.match(new RegExp('(^| )' + this.cookieName + '=([^;]+)')) === null) {
 
 				var wscConnectInfo = elById('wscConnectInfo');
 				var cookieNotice = elBySel('.cookiePolicyNotice');
-				
+
+				elBySel('.text', wscConnectInfo).textContent = this.text[Environment.platform()];
+
 				// move info up, if the cookie notice is displayed
 				if (cookieNotice) {
 					wscConnectInfo.style.bottom = cookieNotice.offsetHeight + 'px';
@@ -35,11 +45,10 @@ define(['WoltLabSuite/Core/Environment'], function(Environment) {
 
 				wscConnectInfo.addEventListener(WCF_CLICK_EVENT, function(e) {
 					e.preventDefault();
-					
+
 					this.setCookie();
 
-					var href = elData(wscConnectInfo, 'href');
-					window.location = href;
+					window.location = this.links[Environment.platform()];
 				}.bind(this));
 
 
@@ -59,7 +68,7 @@ define(['WoltLabSuite/Core/Environment'], function(Environment) {
 			date.setTime(date.getTime() + (this.cookieTime*24*60*60*1000));
 			var expires = date.toUTCString();
 
-			document.cookie = this.cookieName + '=1; max-age=' + maxAge + '; expires=' + expires + '; path=/';		
+			document.cookie = this.cookieName + '=1; max-age=' + maxAge + '; expires=' + expires + '; path=/';
 		}
 	};
 

@@ -1,11 +1,18 @@
-{if !$__wcf->getUser()->userID || !$__wcf->getUser()->wscConnectToken}
-	{assign var='link' value='https://play.google.com/store/apps/details?id=wscconnect.android&pcampaignid=wsc-plugin'}
-	{assign var='text' value='wcf.wsc_connect.info'}
-{else}
-	{assign var='link' value='https://www.wsc-connect.com/apps/'|concat:WSC_CONNECT_APP_ID}
-	{assign var='text' value='wcf.wsc_connect.info.registered'}
+{if !$__wcf->getUser()->wscConnectToken}
+	{assign var=url value="#^https?://#"|preg_replace:'':$__wcf->getPath()|rtrim:"/"}
+	<script data-relocate="true">
+		require(['Language'], function (Language) {
+			Language.addObject({
+				'wcf.wsc_connect.info.ios': '{lang url=$url}wcf.wsc_connect.info.ios{/lang}',
+				'wcf.wsc_connect.info.android': '{lang url=$url}wcf.wsc_connect.info.android{/lang}'
+			});
+		});
+	</script>
+
+	<div id="wscConnectInfo" style="display: none;">
+		<span class="icon icon16 fa-times" id="wscConnectInfoClose"></span>
+		<img src="{@$__wcf->getPath()}images/wscconnect_small.png" alt="">
+		<div class="text"></div>
+		<div class="button">{lang}wcf.wsc_connect.download{/lang}</div>
+	</div>
 {/if}
-<div id="wscConnectInfo" class="info" data-href="{$link}" style="display: none;">
-	<span class="icon icon24 fa-times" id="wscConnectInfoClose"></span>
-	{lang name=PAGE_TITLE|language}{$text}{/lang} 
-</div>

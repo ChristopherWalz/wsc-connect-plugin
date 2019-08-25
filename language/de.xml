@@ -22,8 +22,9 @@
 	</category>
 
 	<category name="wcf.wsc_connect">
-		<item name="wcf.wsc_connect.info"><![CDATA[Lade dir die kostenlose Android-App <strong>WSC-Connect</strong> herunter und erhalte Push-Nachrichten von <strong>{@$name}</strong> direkt auf dein Smartphone. Jetzt im Play-Store herunterladen!]]></item>
-		<item name="wcf.wsc_connect.info.registered"><![CDATA[<strong>{@$name}</strong> ist bei <strong>WSC-Connect</strong>. Klicke hier, um die App zu öffnen.]]></item>
+		<item name="wcf.wsc_connect.info.android"><![CDATA[{$url} in der WSC-Connect App bei Google Play]]></item>
+		<item name="wcf.wsc_connect.info.ios"><![CDATA[{$url} in der WSC-Connect App im App Store]]></item>
+		<item name="wcf.wsc_connect.download"><![CDATA[Download]]></item>
 		<item name="wcf.wsc_connect.wsc_connect"><![CDATA[WSC-Connect]]></item>
 		<item name="wcf.wsc_connect.thirdParty.label"><![CDATA[Drittanbieter-Auth-Token]]></item>
 		<item name="wcf.wsc_connect.thirdParty.description"><![CDATA[Bitte geben Sie dieses Token beim Login über die App anstelle eines Passworts an.]]></item>

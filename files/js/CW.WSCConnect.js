@@ -37,7 +37,7 @@ CW.WSCConnect = Class.extend({
 				
 				this.setCookie();
 
-				window.location = this.link[browser];
+				window.location = this.links[browser];
 			}.bind(this));
 
 

@@ -3,8 +3,8 @@
 	<packageinformation>
 		<packagename>WSC-Connect</packagename>
 		<packagedescription>WSC-Connect</packagedescription>
-		<version>3.0.14</version>
-		<date>2019-06-20</date>
+		<version>3.0.15</version>
+		<date>2019-08-25</date>
 	</packageinformation>
 
 	<authorinformation>
@@ -20,20 +20,10 @@
 		<api version="2018" />
 	</compatibility>
 
-	<instructions type="update" fromversion="3.0.13">
+	<instructions type="update" fromversion="3.0.14">
 		<instruction type="template" />
 		<instruction type="file" />
 		<instruction type="language" />
-		<instruction type="sql">update.sql</instruction>
-		<instruction type="script">acp/update_de.cwalz.wsc-connect_3.0.14.php</instruction>
-	</instructions>
-
-	<instructions type="update" fromversion="3.0.12">
-		<instruction type="template" />
-		<instruction type="file" />
-		<instruction type="language" />
-		<instruction type="sql">update.sql</instruction>
-		<instruction type="script">acp/update_de.cwalz.wsc-connect_3.0.14.php</instruction>
 	</instructions>
 
 	<instructions type="install">

@@ -15,26 +15,23 @@ CW.WSCConnect = Class.extend({
 			android: 'https://play.google.com/store/apps/details?id=wscconnect.android&pcampaignid=wsc-plugin',
 			ios: 'https://apps.apple.com/us/app/wsc-connect/id1462270360'
 		};
-		this.text = {
-			android: WCF.Language.get('wcf.wsc_connect.info.android'),
-			ios: WCF.Language.get('wcf.wsc_connect.info.ios')
-		};
 
 		var userAgent = window.navigator.userAgent.toLowerCase();
-		if ((jQuery.browser.android || jQuery.browser.iOS) && 
+		if ((jQuery.browser.android || jQuery.browser.iOS) &&
 			userAgent.indexOf('wsc-connect mobile browser') === -1 &&
 			document.cookie.match(new RegExp('(^| )' + this.cookieName + '=([^;]+)')) === null) {
 
 			var browser = (jQuery.browser.android) ? 'android' : 'ios';
 			var wscConnectInfo = document.getElementById('wscConnectInfo');
+			var platform = browser.charAt(0).toUpperCase() + browser.slice(1);
 
-			$('.text', $(wscConnectInfo)).text(this.text[browser]);
+			$('.text' + platform, $(wscConnectInfo)).show();
 
 			wscConnectInfo.style.display = 'flex';
 
 			wscConnectInfo.addEventListener("click", function(e) {
 				e.preventDefault();
-				
+
 				this.setCookie();
 
 				window.location = this.links[browser];
@@ -57,6 +54,6 @@ CW.WSCConnect = Class.extend({
 		date.setTime(date.getTime() + (this.cookieTime*24*60*60*1000));
 		var expires = date.toUTCString();
 
-		document.cookie = this.cookieName + '=1; max-age=' + maxAge + '; expires=' + expires + '; path=/';		
+		document.cookie = this.cookieName + '=1; max-age=' + maxAge + '; expires=' + expires + '; path=/';
 	}
 });

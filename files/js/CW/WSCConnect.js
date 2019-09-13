@@ -3,7 +3,7 @@
  * @license	http://www.cwalz.de/forum/index.php?page=TermsOfLicense
  * @package	de.cwalz.wscConnect
  */
-define(['WoltLabSuite/Core/Environment', 'Language'], function(Environment, Language) {
+define(['WoltLabSuite/Core/Environment'], function(Environment) {
 	"use strict";
 
 	function WSCConnect() {}
@@ -13,10 +13,6 @@ define(['WoltLabSuite/Core/Environment', 'Language'], function(Environment, Lang
 			this.links = {
 				android: 'https://play.google.com/store/apps/details?id=wscconnect.android&pcampaignid=wsc-plugin',
 				ios: 'https://apps.apple.com/us/app/wsc-connect/id1462270360'
-			};
-			this.text = {
-				android: Language.get('wcf.wsc_connect.info.android'),
-				ios: Language.get('wcf.wsc_connect.info.ios')
 			};
 			this.cookieName = cookiePrefix + 'wscconnect';
 			this.cookieTime = parseInt(cookieTime);
@@ -29,7 +25,8 @@ define(['WoltLabSuite/Core/Environment', 'Language'], function(Environment, Lang
 				var wscConnectInfo = elById('wscConnectInfo');
 				var pageFooterStickyNotice = elBySel('.pageFooterStickyNotice');
 
-				elBySel('.text', wscConnectInfo).textContent = this.text[Environment.platform()];
+				var platform = Environment.platform().charAt(0).toUpperCase() + Environment.platform().slice(1);
+				elShow(elBySel('.text' + platform, wscConnectInfo));
 
 				// move page footer up
 				if (pageFooterStickyNotice) {

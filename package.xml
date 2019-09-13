@@ -3,7 +3,7 @@
 	<packageinformation>
 		<packagename>WSC-Connect</packagename>
 		<packagedescription>WSC-Connect</packagedescription>
-		<version>3.0.15</version>
+		<version>3.0.17</version>
 		<date>2019-08-25</date>
 	</packageinformation>
 
@@ -20,10 +20,14 @@
 		<api version="2018" />
 	</compatibility>
 
-	<instructions type="update" fromversion="3.0.14">
+	<instructions type="update" fromversion="3.0.16">
 		<instruction type="template" />
 		<instruction type="file" />
-		<instruction type="language" />
+	</instructions>
+
+	<instructions type="update" fromversion="3.0.15">
+		<instruction type="template" />
+		<instruction type="file" />
 	</instructions>
 
 	<instructions type="install">

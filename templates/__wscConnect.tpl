@@ -9,7 +9,7 @@
 		});
 	</script>
 
-	<div id="wscConnectInfo" style="display: none;">
+	<div id="wscConnectInfo" style="visibility: hidden;">
 		<span class="icon icon16 fa-times" id="wscConnectInfoClose"></span>
 		<img src="{@$__wcf->getPath()}images/wscconnect_small.png" alt="">
 		<div class="text"></div>

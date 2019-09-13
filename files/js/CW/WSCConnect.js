@@ -27,21 +27,16 @@ define(['WoltLabSuite/Core/Environment', 'Language'], function(Environment, Lang
 				document.cookie.match(new RegExp('(^| )' + this.cookieName + '=([^;]+)')) === null) {
 
 				var wscConnectInfo = elById('wscConnectInfo');
-				var cookieNotice = elBySel('.cookiePolicyNotice');
+				var pageFooterStickyNotice = elBySel('.pageFooterStickyNotice');
 
 				elBySel('.text', wscConnectInfo).textContent = this.text[Environment.platform()];
 
-				// move info up, if the cookie notice is displayed
-				if (cookieNotice) {
-					wscConnectInfo.style.bottom = cookieNotice.offsetHeight + 'px';
-
-					// reset when closing the cookie notice
-					elBySel('.cookiePolicyNoticeDismiss').addEventListener(WCF_CLICK_EVENT, function(event) {
-						wscConnectInfo.style.bottom = 0;
-					});
+				// move page footer up
+				if (pageFooterStickyNotice) {
+					pageFooterStickyNotice.style.bottom = wscConnectInfo.offsetHeight + 'px';
 				}
 
-				elShow(wscConnectInfo);
+				wscConnectInfo.style.visibility = 'visible';
 
 				wscConnectInfo.addEventListener(WCF_CLICK_EVENT, function(e) {
 					e.preventDefault();
@@ -56,6 +51,9 @@ define(['WoltLabSuite/Core/Environment', 'Language'], function(Environment, Lang
 					e.stopPropagation();
 
 					elRemove(wscConnectInfo);
+
+					pageFooterStickyNotice.style.bottom = 0;
+
 					this.setCookie();
 				}.bind(this));
 			}

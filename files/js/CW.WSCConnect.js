@@ -17,12 +17,13 @@ CW.WSCConnect = Class.extend({
 		};
 
 		var userAgent = window.navigator.userAgent.toLowerCase();
-		if ((jQuery.browser.android || jQuery.browser.iOS) &&
+		var wscConnectInfo = document.getElementById('wscConnectInfo');
+
+		if (wscConnectInfo && (jQuery.browser.android || jQuery.browser.iOS) &&
 			userAgent.indexOf('wsc-connect mobile browser') === -1 &&
 			document.cookie.match(new RegExp('(^| )' + this.cookieName + '=([^;]+)')) === null) {
 
 			var browser = (jQuery.browser.android) ? 'android' : 'ios';
-			var wscConnectInfo = document.getElementById('wscConnectInfo');
 			var platform = browser.charAt(0).toUpperCase() + browser.slice(1);
 
 			$('.text' + platform, $(wscConnectInfo)).show();

@@ -1,1 +1,1 @@
-ALTER TABLE wcf1_user ADD wscConnectLoginDevices TEXT DEFAULT NULL;
+ALTER TABLE wcf1_wsc_connect_notifications CHANGE COLUMN data data MEDIUMTEXT NOT NULL;

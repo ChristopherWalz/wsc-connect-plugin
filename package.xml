@@ -3,8 +3,8 @@
 	<packageinformation>
 		<packagename>WSC-Connect</packagename>
 		<packagedescription>WSC-Connect</packagedescription>
-		<version>3.0.19</version>
-		<date>2020-03-31</date>
+		<version>3.0.20</version>
+		<date>2020-04-09</date>
 	</packageinformation>
 
 	<authorinformation>
@@ -20,12 +20,15 @@
 		<api version="2018" />
 	</compatibility>
 
-	<instructions type="update" fromversion="3.0.18">
+	<instructions type="update" fromversion="3.0.19">
+		<instruction type="template" />
 		<instruction type="file" />
-	</instructions>
-
-	<instructions type="update" fromversion="3.0.17">
-		<instruction type="sql">update.sql</instruction>
+		<instruction type="templateListener" />
+		<instruction type="eventListener" />
+		<instruction type="option" />
+		<instruction type="userMenu" />
+		<instruction type="language" />
+		<instruction type="cronjob" />
 	</instructions>
 
 	<instructions type="install">

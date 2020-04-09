@@ -19,5 +19,5 @@ You can see who is already taking part [over here](https://www.wsc-connect.com/a
 
 Apps for mobile devices
 -----------------------
-- iOS: -
+- iOS: https://apps.apple.com/us/app/wsc-connect/id1462270360
 - Android 4.2+: [Play Store](https://play.google.com/store/apps/details?id=wscconnect.android&pcampaignid=wsc-connect.com)

@@ -6,5 +6,11 @@
 			<eventname>fireEvent</eventname>
 			<listenerclassname>wcf\system\event\listener\WSCConnectListener</listenerclassname>
 		</eventlistener>
+
+		<eventlistener name="wscConnectUserListenerCreated">
+			<eventclassname>wcf\system\user\notification\UserNotificationHandler</eventclassname>
+			<eventname>createdNotification</eventname>
+			<listenerclassname>wcf\system\event\listener\WSCConnectListener</listenerclassname>
+		</eventlistener>
 	</import>
 </data>

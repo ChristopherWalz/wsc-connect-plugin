@@ -1,6 +1,7 @@
 <?php
 namespace wcf\system\event\listener;
 use wcf\action\WSCConnectAPIAction;
+use wcf\data\package\Package;
 use wcf\data\user\User;
 use wcf\system\background\BackgroundQueueHandler;
 use wcf\system\background\job\WSCConnectBackgroundJob;
@@ -56,6 +57,11 @@ class WSCConnectListener implements IParameterizedEventListener {
 	 */
 	public function execute($eventObj, $className, $eventName, array &$parameters) {
 		if (!MODULE_WSC_CONNECT || !WSC_CONNECT_APP_ID || !WSC_CONNECT_APP_SECRET || WSC_CONNECT_PUSH_MODE == self::PUSH_MODE_DISABLE) {
+			return;
+		}
+
+		// for WSC >= 5.2 there will be two events triggered 'fireEvent' and 'createdNotification'. We only want to proceed with 'fireEvent' when it's not a WSC 5.2 or higher
+		if ($eventName === 'fireEvent' && Package::compareVersion(WCF_VERSION, '5.2', '>=')) {
 			return;
 		}
 

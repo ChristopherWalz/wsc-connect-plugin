@@ -8,8 +8,8 @@
 	</packageinformation>
 
 	<authorinformation>
-		<author>Christopher Walz</author>
-		<authorurl>http://www.wsc-connect.com</authorurl>
+		<author><![CDATA[Christopher Walz]]></author>
+		<authorurl><![CDATA[https://www.wsc-connect.com/]]></authorurl>
 	</authorinformation>
 
 	<requiredpackages>
